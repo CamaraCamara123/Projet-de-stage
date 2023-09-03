@@ -1,0 +1,71 @@
+# 
+*/node_modules/**/*
+*/.expo/*
+*/npm-debug.*
+*/package-lock.json
+*/yarn.lock
+*/*.jks
+*/*.p12
+*/*.key
+*/*.mobileprovision
+(pour React.js)
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+*/.DS_Store
+*/.env.local
+*/.env.development.local
+*/.env.test.local
+*/.env.production.local
+
+*/npm-debug.log*
+*/yarn-debug.log*
+*/yarn-error.log*
+
+# React Native
+*/node_modules/**/*
+*/.expo/*
+*/npm-debug.*
+*/package-lock.json
+*/yarn.lock
+*/*.jks
+*/*.p12
+*/*.key
+*/*.mobileprovision
+
+# Flask (Python)
+*/.DS_Store
+*/.flaskenv
+*/*.pyc
+*/*.pyo
+*/env/
+*/venv/
+*/.venv/
+*/env*
+*/dist/
+*/build/
+*/*.egg
+*/*.egg-info/
+*/.tox/
+*/.cache/
+*/.pytest_cache/
+*/.idea/
+*/docs/_build/
+*/.vscode
+
+# Coverage reports
+*/htmlcov/
+*/.coverage
+*/.coverage.*
+*/*,cover

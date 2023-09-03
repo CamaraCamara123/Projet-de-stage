@@ -1,0 +1,25 @@
+.dashboard-container{
+    display: flex;
+    justify-content: stretch;
+    background-color: white;
+}
+
+.card-number{
+    justify-content: center;
+    text-align: center;
+    color: burlywood;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-weight: 900;
+    font-size: 400%;
+}
+
+.head{
+    justify-content: center;
+    text-align: center;
+}
+
+.head:hover{
+    color: cornflowerblue;
+    font-size: larger;
+    
+}

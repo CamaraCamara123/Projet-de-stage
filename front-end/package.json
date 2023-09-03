@@ -1,0 +1,56 @@
+{
+  "name": "front-end",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@canvasjs/react-charts": "^1.0.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@syncfusion/ej2-react-base": "^22.2.5",
+    "@syncfusion/ej2-react-buttons": "^22.2.9",
+    "@syncfusion/ej2-react-calendars": "^22.2.10",
+    "@syncfusion/ej2-react-dropdowns": "^22.2.10",
+    "@syncfusion/ej2-react-inputs": "^22.2.9",
+    "@syncfusion/ej2-react-navigations": "^22.2.8",
+    "@syncfusion/ej2-react-popups": "^22.2.9",
+    "@syncfusion/ej2-react-schedule": "^22.2.8",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.4.0",
+    "framer-motion": "^10.16.2",
+    "mdb-react-ui-kit": "^6.2.0",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.8.0",
+    "react-dom": "^18.2.0",
+    "react-modal": "^3.16.1",
+    "react-router-dom": "^6.15.0",
+    "react-scripts": "5.0.1",
+    "react-select": "^5.7.4",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
