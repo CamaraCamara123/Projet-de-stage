@@ -271,7 +271,7 @@ const New_consultation = () => {
                         )}
                     </View>
                 </> :
-                <Block flex middle style={{ justifyContent: 'center' }}>
+                <Block flex middle style={{ justifyContent: 'center', borderRadius: '20' }}>
                     <StatusBar hidden />
                     <ImageBackground
                         source={Images.RegisterBackground}
@@ -283,7 +283,7 @@ const New_consultation = () => {
                             <Block style={styles.registerContainer}>
                                 <Block flex>
                                     <Block flex={0.17} middle>
-                                        <Text color="#8898AA" size={30}>
+                                        <Text color="green" size={30} style={{ fontWeight: '900' }}>
                                             New consultation
                                         </Text>
                                     </Block>
@@ -295,7 +295,7 @@ const New_consultation = () => {
                                         >
                                             <Block width={width * 0.8} center>
                                                 <Image source={{ uri: capturedImage.uri }} style={{ width: 300, height: 200 }} />
-                                                <Button onPress={handleSubmit}><Text>Confirm</Text></Button>
+                                                {/* <Button onPress={handleSubmit}><Text>Confirm</Text></Button> */}
                                             </Block>
                                             <Block width={width * 0.8} style={{ marginBottom: 5, marginTop: 20 }}>
                                                 <SearchableDropdown
@@ -325,11 +325,14 @@ const New_consultation = () => {
                                                 />
                                                 {symptomes.map((item) => (
                                                     <TouchableOpacity key={item.id} onPress={() => handleItemDeselect(item)}>
-                                                        <Text>{item.name} - Deselect</Text>
+                                                        <Text>{item.name}</Text>
                                                     </TouchableOpacity>
                                                 ))}
                                             </Block>
                                         </KeyboardAvoidingView>
+                                        <Block>
+                                            <Button onPress={handleSubmit}><Text>Confirm</Text></Button>
+                                        </Block>
                                     </Block>
                                 </Block>
                             </Block>

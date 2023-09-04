@@ -9,7 +9,7 @@ import sidebar_menu_medecin from '../../constants/siderBar-menu-medecin';
 import axios from 'axios';
 import fetchPatients from '../fetchElement/fetchPatients';
 import fetchSecretaires from '../fetchElement/fetchSecretaires';
-import { fetchRdvs, fetchMedecinRdvs, fetchPatientRdvs } from '../fetchElement/fetchRdvs';
+import { fetchRdvs, fetchPatientRdvs, fetchPatientMedecinTodayRdvs } from '../fetchElement/fetchRdvs';
 import sidebar_menu_secretaire from '../../constants/sidebar_menu_secretaire';
 import { fetchMedecinPatient, fetchMedecins } from '../fetchElement/fetchMedecins';
 import { fetchConsultations } from '../fetchElement/fetchConsultations';
@@ -21,14 +21,12 @@ import Transition from '../../constants/transition';
 
 function Dashboard() {
   const { isLoggedIn, logout } = useAuth();
-  const { userData, updateUserData, patients, updatePatients, updatePatient } = useUserData();
-  const { medecins, updateMedecins, updateMedecin, medecin } = useUserData();
-  const { secretaires, updateSecretaires, updateSecretaire } = useUserData();
-  const { rdvs, updateRdvs } = useUserData();
-  const { maladies, updateMaladies } = useUserData();
-  const { consultations, updateConsultations } = useUserData();
-  const { images, updateImages } = useUserData();
-  const { stades, updateStades } = useUserData();
+  const {updateUserData, updatePatients, updatePatient } = useUserData();
+  const { updateMedecins, updateMedecin} = useUserData();
+  const { updateSecretaires, updateSecretaire } = useUserData();
+  const {updateRdvs } = useUserData();
+  const { updateMaladies } = useUserData();
+  const { updateConsultations } = useUserData();
 
   //tableau de bord utilisateur
   const [sidermenu, setSiderMenu] = useState([]);
@@ -96,7 +94,7 @@ function Dashboard() {
           updateUserData(response.data);
         } else if (response.data.role.includes('medecin') && !response.data.role.includes('admin')) {
           setSiderMenu(sidebar_menu_medecin);
-          fetchMedecinRdvs(response.data._id, updateRdvs);
+          fetchPatientMedecinTodayRdvs(response.data._id, updateRdvs);
           fetchSecretaires(updateSecretaires);
           agenda([response.data]);
           updateMedecin(response.data);

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import DashboardHeader from '../../components/DashboardHeader';
 
 import { calculateRange, sliceData } from '../../utils/table-pagination';
 
@@ -7,15 +6,12 @@ import '../styles.css';
 import { useUserData } from '../../contexts/UserDataContext';
 import NotificationIcon from '../../assets/icons/notification.svg';
 import SettingsIcon from '../../assets/icons/settings.svg';
-import axios from 'axios';
 import { Navigate } from 'react-router-dom';
-import Form_confirm_delete from '../../components/form/form_delete';
-import { MDBIcon } from 'mdb-react-ui-kit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrashAlt, faEye, faAnglesUp, faAnglesDown, faHeartbeat, faHeartPulse, faPeopleCarry } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrashAlt,faHeartbeat, faPeopleCarry } from '@fortawesome/free-solid-svg-icons';
 import Form_rdv from '../../components/form/form_rdv';
 import Form__delete_rdv from '../../components/form/form_delete_rdv';
-import { fetchRdv, fetchRdvs } from '../../components/fetchElement/fetchRdvs';
+import { fetchMedecinRdvs, fetchRdv } from '../../components/fetchElement/fetchRdvs';
 import Form_consultation from '../../components/form/form_consult';
 import { fetchConsultationsRdv } from '../../components/fetchElement/fetchConsultations';
 import Transition from '../../constants/transition';
@@ -36,6 +32,7 @@ function Rdvs() {
   const { rdv, updateRdv, updateRdvs, updateConsultations, userData, medecins } = useUserData();
   const [doctor, setDoctor] = useState([]);
   const [rendez_vous, setRendez_vous] = useState([]);
+  const [btnRdv, setBtnRdv ] = useState("More");
   const colors = ['#FF5733', '#FFC300', '#36A2EB', '#4CAF50', '#E91E63'];
 
   useEffect(() => {
@@ -83,6 +80,10 @@ function Rdvs() {
   const openModal = () => {
     modalIsOpen ? setModalIsOpen(false) : setModalIsOpen(true);
   };
+
+  const fAllRdvs = async()=>{
+    await fetchMedecinRdvs(userData._id,updateRdvs)
+  }
 
   useEffect(() => {
     setPagination(calculateRange(rdvs, 5));
@@ -157,6 +158,30 @@ function Rdvs() {
             setModalIsOpen6(false)
             openModal()
           }}>New rdv</button>
+          <div className='dashbord-header-right'>
+            <img
+              src={NotificationIcon}
+              alt='notification-icon'
+              className='dashbord-header-icon' />
+            <img
+              src={SettingsIcon}
+              alt='settings-icon'
+              className='dashbord-header-icon' />
+            <img
+              className='dashbord-header-avatar'
+              src={userData.photo} />
+          </div>
+        </div>}
+        {(!userData.role.includes('admin')&& userData.role.includes('medecin')) && <div className='dashbord-header-container'>
+          <button className='dashbord-header-btn' onClick={() => {
+            setModalIsOpen(false)
+            setModalIsOpen4(false)
+            setModalIsOpen2(false)
+            setModalIsOpen3(false)
+            setModalIsOpen5(false)
+            setModalIsOpen6(false)
+            fAllRdvs()
+          }}>More</button>
           <div className='dashbord-header-right'>
             <img
               src={NotificationIcon}

@@ -25,6 +25,7 @@ import { useUserData } from "../contexts/useUserData";
 import { useAuth } from "../contexts/useAuth";
 import { AsyncStorage } from 'react-native';
 import New_consultation from "../screens/New_consultation";
+import Consultations from "../screens/Consultations";
 
 const { width } = Dimensions.get("screen");
 
@@ -187,6 +188,23 @@ function HomeStack(props) {
           header: ({ navigation, scene }) => (
             <Header
               title="back"
+              back
+              black
+              transparent
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="consultations"
+        component={Consultations}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title=""
               back
               black
               transparent

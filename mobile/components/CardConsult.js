@@ -1,7 +1,7 @@
 import React from 'react';
 import { withNavigation } from '@react-navigation/compat';
 import PropTypes from 'prop-types';
-import { StyleSheet, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Image, TouchableWithoutFeedback } from 'react-native';
 import { Block, Text, theme } from 'galio-framework';
 import Images from "../constants/Images";
 import { argonTheme } from '../constants';
@@ -11,7 +11,7 @@ import { useUserData } from '../contexts/useUserData';
 
 
 
-const Card = (props)=> {
+const CardConsult = (props)=> {
 
     const { navigation, item, horizontal, full, style, ctaColor, imageStyle } = props;
     
@@ -25,13 +25,11 @@ const Card = (props)=> {
       styles.shadow
     ];
 
-    const {userData, updateRdv, updateConsultations} = useUserData()
+    const {userData, updateRdv, updateConsultation} = useUserData()
 
     const fconsults = (rdv_id) =>{
-      console.log('hello')
       fetchRdv(rdv_id,updateRdv);
-      fetchConsultationsRdv(rdv_id, updateConsultations)
-      navigation.navigate("consultations")
+      navigation.navigate("New_consultation")
     }
 
     return (
@@ -43,11 +41,11 @@ const Card = (props)=> {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback onPress={() => fconsults(item._id)}>
           <Block flex space="between" style={styles.cardDescription}>
-            <Text size={14} style={styles.cardTitle}>Name : {item.patient.nom} {item.patient.prenom}</Text>
-            <Text size={14} style={styles.cardTitle}>Phone : {item.patient.tel}</Text>
-            <Text size={14} style={styles.cardTitle}>Date : {new Date(item.dateDebutRdv).toISOString().split('T')[0]}</Text>
+            <Text size={14} style={styles.cardTitle}>Name : {item.rdv.patient.nom} {item.rdv.patient.prenom}</Text>
+            <Text size={14} style={styles.cardTitle}>Phone : {item.rdv.patient.tel}</Text>
+            <Text size={14} style={styles.cardTitle}>Date : {new Date(item.dateConsult).toISOString().split('T')[0]}</Text>
             <Text size={12} muted={!ctaColor} color={ctaColor || argonTheme.COLORS.ACTIVE} bold> Hour {
-                        `${new Date(item.dateDebutRdv).getHours()}:${String(new Date(item.dateDebutRdv).getMinutes()).padStart(2, '0')}`
+                        `${new Date(item.dateConsult).getHours()}:${String(new Date(item.dateConsult).getMinutes()).padStart(2, '0')}`
                       }</Text>
           </Block>
         </TouchableWithoutFeedback>
@@ -56,7 +54,7 @@ const Card = (props)=> {
   }
 
 
-Card.propTypes = {
+CardConsult.propTypes = {
   item: PropTypes.object,
   horizontal: PropTypes.bool,
   full: PropTypes.bool,
@@ -76,6 +74,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexWrap: 'wrap',
     paddingBottom: 6
+    
   },
   cardDescription: {
     padding: theme.SIZES.BASE / 2
@@ -112,4 +111,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withNavigation(Card);
+export default withNavigation(CardConsult);

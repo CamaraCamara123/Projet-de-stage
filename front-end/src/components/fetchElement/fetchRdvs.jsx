@@ -64,6 +64,22 @@ export const fetchMedecinRdvs = async (user_id,updateRdvs) => {
     }
   };
 
+  export const fetchPatientMedecinTodayRdvs = async (medecin_id,updateRdvs) => {
+    const token = localStorage.getItem('token');
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    try {
+      const response = await axios.get(`http://192.168.11.104:5000/api/rendez_vous/dermatologue/today/${medecin_id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      updateRdvs(response.data);
+      console.log(response.data)
+    } catch (error) {
+      console.error('Erreur lors de la récupération des rdv d\'aujourd\'hui :', error);
+    }
+  };
+
   export const fetchRdv = async (rdv_id,updateRdv) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;

@@ -1,8 +1,8 @@
 from flask import Flask
 from pymongo import MongoClient
 from mongoengine import Document, StringField, IntField
-from mongoengine import connect
-from datetime import datetime
+from mongoengine import connect, Q
+from datetime import datetime, date
 from flask import Flask, request, jsonify, send_file
 import json
 from bson import ObjectId
@@ -16,10 +16,10 @@ from functools import wraps
 from flask_login import LoginManager
 import secrets
 import os
+import datetime
 from flask_cors import CORS
 from modelML import get_model
 import jwt
-import datetime
 import shutil
 import cv2
 from matplotlib import pyplot as plt
@@ -112,7 +112,7 @@ CORS(app)  # Active les en-têtes CORS pour toutes les routes
 app.config["SECRET_KEY"] = secrets.token_hex(16)
 app.config[
     "UPLOAD_FOLDER"
-] = "C:\\Users\\Lenovo\\OneDrive\Bureau\\Stage\\Projet de stage\\front-end\\public\\images\\"
+] = os.path.dirname(_file_)
 app.config["MONGODB_SETTINGS"] = {"db": "donnees", "host": "localhost", "port": 27017}
 connect(host="mongodb://localhost:27017/donnees")
 
@@ -366,13 +366,13 @@ def upload_patient_image(username):
 
     if image and allowed_file(image.filename):
         filename = secure_filename(image.filename)
-        profile_folder = os.path.join(app.config["UPLOAD_FOLDER"],'profil', username)
+        profile_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images','profil', username)
         os.makedirs(profile_folder, exist_ok=True)
         image_path = os.path.join(profile_folder, filename)
         image.save(image_path)
 
         user.photoName = filename
-        user.photo = os.path.join("\\", "images", "profil", username, filename)
+        user.photo = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images', "images", "profil", username, filename)
         user.save()
 
         return jsonify({"message": "Image uploaded successfully"}), 200
@@ -455,7 +455,7 @@ def delete_patient(patient_id):
     except Patient.DoesNotExist:
         return jsonify({"message": "Patient non trouvé"}), 404
 
-    profil_folder = os.path.join(app.config["UPLOAD_FOLDER"],'profil', patient.username)
+    profil_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images','profil', patient.username)
     try:
         shutil.rmtree(profil_folder)
     except OSError:
@@ -565,7 +565,7 @@ def delete_dermatologue(dermatologue_id):
     except Dermatologue.DoesNotExist:
         return jsonify({"message": "Dermatologue non trouvé"}), 404
 
-    profil_folder = os.path.join(app.config["UPLOAD_FOLDER"],'profil', dermatologue.username)
+    profil_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images','profil', dermatologue.username)
     try:
         shutil.rmtree(profil_folder)
     except OSError:
@@ -742,7 +742,7 @@ def delete_secretaire(secretaire_id):
         secretaire = Secretaire.objects.get(pk=secretaire_id)
     except Secretaire.DoesNotExist:
         return jsonify({"message": "Secrétaire non trouvé"}), 404
-    profil_folder = os.path.join(app.config["UPLOAD_FOLDER"],'profil', secretaire.username)
+    profil_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images','profil', secretaire.username)
     try:
         shutil.rmtree(profil_folder)
     except OSError:
@@ -811,7 +811,7 @@ def delete_rdv(rdv_id):
     for consultation in rdv.consultations:
         formatted_datetime = consultation.dateConsult.strftime("%Y-%m-%d_%H-%M-%S")
         consult_folder = os.path.join(
-            app.config["UPLOAD_FOLDER"],'consultation',
+            app.config["UPLOAD_FOLDER"],'uploads','images','consultation',
             consultation.rdv.patient.username
         )
         try:
@@ -863,6 +863,27 @@ def get_rdv_by_patient(patient_id):
     return jsonify(rdv_data), 200
 
 
+#################################### get doctor rdv by day #################################################
+@app.route("/api/rendez_vous/dermatologue/today/<string:derm_id>", methods=["GET"])
+def get_dermatologue_today_rdv(derm_id):
+    try:
+        derms = Dermatologue.objects.get(pk=derm_id)
+    except Dermatologue.DoesNotExist:
+        return jsonify({"message": "Dermatologue introuvable"}), 404
+   
+    today = datetime.datetime.today()
+    # print(today)
+    # # Filtrez les rendez-vous pour n'inclure que ceux d'aujourd'hui
+    # rdvs = Rendez_vous.objects.filter(medecin=derms, dateDebutRdv__date=today).order_by("-dateDebutRdv")
+    start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
+    end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
+
+    # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
+    rdvs = Rendez_vous.objects.filter(Q(medecin=derms) & Q(dateDebutRdv__gte=start_of_day) & Q(dateDebutRdv__lte=end_of_day)).order_by("-dateDebutRdv")
+
+    rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
+    return jsonify(rdv_data), 200
+
 #################################### get rdv by medecin #################################################
 @app.route("/api/rendez_vous/dermatologue/<string:derm_id>", methods=["GET"])
 def get_rdv_by_dermatologue(derm_id):
@@ -870,7 +891,10 @@ def get_rdv_by_dermatologue(derm_id):
         derms = Dermatologue.objects.get(pk=derm_id)
     except Dermatologue.DoesNotExist:
         return jsonify({"message": "Dermatologue introuvable"}), 404
+   
+    today = date.today()
 
+    # Filtrez les rendez-vous pour n'inclure que ceux d'aujourd'hui
     rdvs = Rendez_vous.objects.filter(medecin=derms).order_by("-dateDebutRdv")
 
     rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
@@ -901,7 +925,7 @@ def update_rdv(rdv_id):
 
 ####################################################### les rdv d'un medecin avec un patient donné ##########################################
 @app.route(
-    "/api/rdv/medecin/patient/<string:medecin_id>/<string:patient_id>", methods=["POST"]
+    "/api/rdv/medecin/patient/<string:medecin_id>/<string:patient_id>", methods=["GET"]
 )
 def rdv_medecin_patient(medecin_id, patient_id):
     try:
@@ -1022,7 +1046,7 @@ def upload_consutation_image(consult_id):
         filename = secure_filename(image.filename)
         formatted_datetime = consultation.dateConsult.strftime("%Y-%m-%d_%H-%M-%S")
         consult_folder = os.path.join(
-            app.config["UPLOAD_FOLDER"],"consultation",
+            app.config["UPLOAD_FOLDER"], 'uploads','images',"consultation",
             consultation.rdv.patient.username,
             formatted_datetime,
         )
@@ -1030,12 +1054,8 @@ def upload_consutation_image(consult_id):
         image_path = os.path.join(consult_folder, filename)
         image.save(image_path)
         consultation.imageName = os.path.join(
-            "\\",
-            "images",
-            "consultation",
-            consultation.rdv.patient.username,
-            formatted_datetime,
-            filename,
+            consult_folder,
+            filename
         )
         consultation.imagePath = image_path
         consultation.save()
@@ -1105,7 +1125,7 @@ def delete_consultation(consult_id):
 
     formatted_datetime = consultation.dateConsult.strftime("%Y-%m-%d_%H-%M-%S")
     consult_folder = os.path.join(
-        app.config["UPLOAD_FOLDER"],"consultation",
+        app.config["UPLOAD_FOLDER"],'uploads','images',"consultation",
         consultation.rdv.patient.username,
         formatted_datetime
     )
@@ -1150,13 +1170,13 @@ def valide_diagnostic(consult_id, maladie_id):
     file_name = consult.imageName.split("\\")[-1]
     image_stade.title = file_name
     image_stade.imagePath = os.path.join(
-        "\\", "images", "maladies", stade.maladie.nom, stade.stade, file_name
+        app.config['UPLOAD_FOLDER'],'uploads','images', "maladies", stade.maladie.nom, stade.stade, file_name
     )
     image_stade.stade = stade
     print(consult.imagePath)
     source_file_path = source_file_path = consult.imagePath
     destination_file_path = os.path.join(
-        app.config["UPLOAD_FOLDER"],"maladies", stade.maladie.nom, stade.stade
+        app.config["UPLOAD_FOLDER"],'uploads','images',"maladies", stade.maladie.nom, stade.stade
     )
     shutil.copy(source_file_path, destination_file_path)
 
@@ -1245,7 +1265,7 @@ def delete_maladie(maladie_id):
                 pass
 
         # Supprimer le dossier du stade
-        stade_folder = os.path.join(app.config["UPLOAD_FOLDER"],"maladies", stade.maladie.nom)
+        stade_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images',"maladies", stade.maladie.nom)
         try:
             shutil.rmtree(stade_folder)
         except OSError:
@@ -1329,7 +1349,7 @@ def delete_stade(stade_id):
 
     # Supprimer le dossier du stade
     stade_folder = os.path.join(
-        app.config["UPLOAD_FOLDER"], "maladies", stade.maladie.nom, stade.stade
+        app.config["UPLOAD_FOLDER"],'uploads','images', "maladies", stade.maladie.nom, stade.stade
     )
     try:
         shutil.rmtree(stade_folder)
@@ -1360,7 +1380,7 @@ def create_image(stade_id):
 
         # Créez un sous-dossier pour la maladie si elle n'existe pas déjà
         maladie_folder = os.path.join(
-            app.config["UPLOAD_FOLDER"],"maladies", stade.maladie.nom, stade.stade
+            app.config["UPLOAD_FOLDER"],'uploads','images',"maladies", stade.maladie.nom, stade.stade
         )
         os.makedirs(maladie_folder, exist_ok=True)
 
@@ -1369,7 +1389,7 @@ def create_image(stade_id):
 
         title = filename
         image_path = os.path.join(
-            "\\", "images", "maladies", stade.maladie.nom, stade.stade, filename
+            app.config["UPLOAD_FOLDER"],'uploads', "images", "maladies", stade.maladie.nom, stade.stade, filename
         )
 
         imageStade = ImageStade(title=title, imagePath=image_path, stade=stade)
