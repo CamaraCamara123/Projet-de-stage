@@ -1,13 +1,10 @@
 import { Block, Text, theme } from "galio-framework";
-import { Image, ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { argonTheme } from "../constants";
 import { Button, DrawerItem as DrawerCustomItem } from "../components";
-import Images from "../constants/Images";
 import React, { useEffect } from "react";
 import { useAuth } from "../contexts/useAuth";
-import { useNavigation } from '@react-navigation/native';
-import { fetchConsultations } from "../components/fetchElement/fetchConsultation";
-import { fetchMedecinRdvs, fetchRdvs } from "../components/fetchElement/fetchRdvs";
+import { fetchMedecinDayConsultations } from "../components/fetchElement/fetchConsultation";
 import { useUserData } from "../contexts/useUserData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -21,9 +18,9 @@ function CustomDrawerContent({
   state,
   ...rest
 }) {
-  const screens = ["Home", "Profile", "Articles"];
+  const screens = ["Home", "Profile"];
   const { logout } = useAuth()
-  const { userData, updateConsultations, updateUserData, updateRdvs, updateMaladies } = useUserData()
+  const { userData, updateConsultations, updateUserData, path, updateMaladies } = useUserData()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -31,15 +28,14 @@ function CustomDrawerContent({
         const token = await AsyncStorage.getItem('token');
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-        const response = await axios.get('http://192.168.11.104:5000/api/users/current', {
+        const response = await axios.get(`${path}/api/users/current`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.status === 200) {
           if (response.data.role.includes('medecin') && !response.data.role.includes('admin')) {
-            fetchMedecinRdvs(response.data._id, updateRdvs);
-            fetchConsultations(updateConsultations);
-            fetchMaladies(updateMaladies);
+            fetchMedecinDayConsultations(path,response.data._id, updateConsultations);
+            fetchMaladies(path,updateMaladies);
             updateUserData(response.data);
           } else {
             logout();
@@ -65,10 +61,8 @@ function CustomDrawerContent({
       style={styles.container}
       forceInset={{ top: "always", horizontal: "never" }}
     >
-      <Block flex={0.06} style={styles.header}>
-        <Image styles={styles.logo} source={Images.Logo} />
-      </Block>
-      <Block flex style={{ paddingLeft: 8, paddingRight: 14 }}>
+      
+      <Block flex style={{ paddingLeft: 8, paddingRight: 14, marginTop:10 }}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           {screens.map((item, index) => {
             return (

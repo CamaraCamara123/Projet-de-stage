@@ -14,6 +14,8 @@ import { faEdit, faTrashAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 import Form_secretaire from '../../components/form/form_secretaire';
 import Profile from '../profiles/Profile';
 import Transition from '../../constants/transition';
+import { Table } from 'react-bootstrap';
+import './style.css'
 
 function Secretaires() {
   const { secretaires, userData } = useUserData();
@@ -25,7 +27,7 @@ function Secretaires() {
   const [modalIsOpen2, setModalIsOpen2] = useState(false);
   const [modalIsOpen3, setModalIsOpen3] = useState(false);
   const [modalIsOpen4, setModalIsOpen4] = useState(false);
-  const { secretaire, updatePatient, updateMedecin, updateSecretaire } = useUserData();
+  const { secretaire, updatePatient, updateMedecin, updateSecretaire, path } = useUserData();
 
   updateMedecin(null);
   updatePatient(null);
@@ -65,7 +67,7 @@ function Secretaires() {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get(`http://192.168.11.104:5000/api/users/user/${user_id}`, {
+      const response = await axios.get(`${path}/api/users/user/${user_id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -105,7 +107,7 @@ function Secretaires() {
             setModalIsOpen2(false)
             setModalIsOpen3(false)
             openModal()
-          }}>New secretaire</button>
+          }}>New Secretary</button>
           <div className='dashbord-header-right'>
             <img
               src={NotificationIcon}
@@ -135,15 +137,15 @@ function Secretaires() {
             </div>
           </div>
 
-          <table>
+          <Table responsive striped bordered>
             <thead>
-              <th>NOM</th>
-              <th>PRENOM</th>
-              <th>Username</th>
+              <th>FIRST NAME</th>
+              <th>LAST NAME</th>
+              <th>USERNAME</th>
               {/* <th>Adresse</th> */}
-              <th>Telephone</th>
-              <th>Genre</th>
-              <th>Actions</th>
+              <th>PHONE</th>
+              <th>GENDER</th>
+              <th>ACTIONS</th>
             </thead>
 
             {filteredSecretaires.length !== 0 ? (
@@ -170,7 +172,7 @@ function Secretaires() {
                     </td>
                     <td>
                       <span>
-                        <button className='btn btn-success' onClick={() => {
+                        <button className='elt-btn btn btn-success' onClick={() => {
                           setModalIsOpen(false)
                           setModalIsOpen4(false)
                           setModalIsOpen2(false)
@@ -181,7 +183,7 @@ function Secretaires() {
                         </button>
                       </span>
                       <span>
-                        <button className='btn btn-danger display-flex' onClick={() => {
+                        <button className='elt-btn btn btn-danger display-flex' onClick={() => {
                           setModalIsOpen(false)
                           setModalIsOpen4(false)
                           setModalIsOpen2(false)
@@ -192,7 +194,7 @@ function Secretaires() {
                         </button>
                       </span>
                       <span>
-                        <button className='btn btn-primary' onClick={() => {
+                        <button className='elt-btn btn btn-primary' onClick={() => {
                           setModalIsOpen(false)
                           setModalIsOpen4(false)
                           setModalIsOpen2(false)
@@ -207,7 +209,7 @@ function Secretaires() {
                 ))}
               </tbody>
             ) : null}
-          </table>
+          </Table>
 
           {filteredSecretaires.length !== 0 ? (
             <div className='dashboard-content-footer'>

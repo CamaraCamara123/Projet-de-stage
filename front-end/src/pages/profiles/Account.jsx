@@ -12,27 +12,10 @@ import Transition from '../../constants/transition';
 
 export default function Account() {
 
-  const { patient, medecin, secretaire, userData } = useUserData();
+  const { patient, path, userData } = useUserData();
   const [user, setUser] = useState();
-  const [showModal, setShowModal] = useState(false);
-  const [photo, setPhoto] = useState()
   const [docs, setDocs] = useState(false)
 
-  // const handlerPhoto = async (user_id)=>{
-  //   const token = localStorage.getItem('token');
-  //     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  //       try {
-  //           const response = await axios.get(`http://192.168.11.104:5000/api/patients/${user_id}/image`, {
-  //               headers: {
-  //                   'Content-Type': 'application/json'
-  //               }
-  //           });
-  //           setPhoto(response.data);
-  //           console.log(response.data)
-  //       } catch (error) {
-  //           console.error('Erreur lors de la récupération de la photo :', error);
-  //       }
-  // }
   useEffect(() => {
     if (userData) {
       setUser(userData);
@@ -55,7 +38,7 @@ export default function Account() {
                 <MDBRow className="g-0">
                   <MDBCol md="4" className="gradient-custom text-center text-white"
                     style={{ borderTopLeftRadius: '.5rem', borderBottomLeftRadius: '.5rem' }}>
-                    <MDBCardImage src={user.photo}
+                    <MDBCardImage src={`${path}/uploads/${user.photo}`}
                       alt={user.photoName} className="my-5 cercle" style={{ width: '80px', borderRadius: "50%" }} fluid />
                     <MDBTypography tag="h5">{user.nom} {user.prenom}</MDBTypography>
                     <MDBCardText>{user.role[0]}</MDBCardText>

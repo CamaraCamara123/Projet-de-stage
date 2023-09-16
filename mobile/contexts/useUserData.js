@@ -23,7 +23,7 @@ export function UserDataProvider({ children }) {
   const [medecins, setMedecins] = useState([]);
   const [medecin, setMedecin] = useState(null);
 
-  const [secretaires, setSecretaires] = useState([]);
+  const [details, setDetails] = useState([]);
   const [secretaire, setSecretaire] = useState(null);
 
   const [maladies, setMaladies] = useState([]);
@@ -43,6 +43,7 @@ export function UserDataProvider({ children }) {
 
   const [diagnostics, setDiagnostics] = useState([])
   const [diagnostic, setDiagnostic] = useState(null)
+  const [path, setPath] = useState("http://192.168.11.104:5000")
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -73,8 +74,8 @@ export function UserDataProvider({ children }) {
     setMedecin(data)
   }
 
-  const updateSecretaires = (data) => {
-    setSecretaires(data)
+  const updateDetails = (data) => {
+    setDetails(data)
   }
   const updateSecretaire = (data) => {
     setSecretaire(data)
@@ -132,7 +133,7 @@ export function UserDataProvider({ children }) {
         patient, updatePatient,
         medecins, updateMedecins,
         medecin, updateMedecin,
-        secretaires, updateSecretaires,
+        details, updateDetails,
         secretaire, updateSecretaire,
         maladies, updateMaladies,
         maladie, updateMaladie,
@@ -146,7 +147,8 @@ export function UserDataProvider({ children }) {
         consultations,updateConsultations,
         consultation, updateConsultation,
         diagnostics,updateDiagnostics,
-        diagnostic,updateDiagnostic
+        diagnostic,updateDiagnostic,
+        path
       }}>
       {children}
     </UserDataContext.Provider>

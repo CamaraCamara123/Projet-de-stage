@@ -1,12 +1,11 @@
 
 import React, { useEffect, useState } from "react";
-import { Modal, Button } from 'react-bootstrap';
-import axios from "axios"; // Import Axios
+import { Button } from 'react-bootstrap';
+import axios from "axios";
 import "./form.css";
-import { Link, Navigate } from "react-router-dom";
 import { useUserData } from "../../contexts/UserDataContext";
 import { fetchMedecinRdvs, fetchPatientRdvs, fetchRdvs } from "../fetchElement/fetchRdvs";
-import { Week, Month, TimelineViews, TimelineMonth, Agenda, ScheduleComponent, ResourcesDirective, ResourceDirective, ViewsDirective, ViewDirective, Inject } from '@syncfusion/ej2-react-schedule';
+import { Week, Month, Day, WorkWeek, TimelineViews, TimelineMonth, Agenda, ScheduleComponent, Inject } from '@syncfusion/ej2-react-schedule';
 import '@syncfusion/ej2-base/styles/material.css';
 import '@syncfusion/ej2-react-buttons/styles/material.css';
 import '@syncfusion/ej2-react-calendars/styles/material.css';
@@ -14,211 +13,322 @@ import '@syncfusion/ej2-react-dropdowns/styles/material.css';
 import '@syncfusion/ej2-react-inputs/styles/material.css';
 import '@syncfusion/ej2-react-popups/styles/material.css';
 import '@syncfusion/ej2-react-schedule/styles/material.css';
+import Select from "react-select";
+import { startOfMonth, endOfMonth, eachDayOfInterval, format } from "date-fns";
+import { useNavigate } from 'react-router-dom';
 
-function Form_rdv({ open,doctor,rdvs, rdvToUpdate }) {
-    const [modalIsOpen, setModalIsOpen] = useState(open);
+
+function Form_rdv() {
     const [dateDebutRdv, setDateDebutRdv] = useState();
-    const [patient_id, setPatient_id] = useState();
     const [dateFinRdv, setDateFinRdv] = useState();
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const { updateRdvs, patients, patient, medecins, userData } = useUserData();
+    const { updateRdvs, path, patient, medecins, userData, rdv, medecinRdvs, daysOff, doublons } = useUserData();
     const [bouton, setBouton] = useState("save");
-    const [doctor_id, setDoctor_id] = useState();
-    
-
+    const [doctors, setDoctors] = useState();
+    const [doctor, setDoctor] = useState();
+    const [doctorSelected, setDoctorSelected] = useState()
+    const [daysDisplay, setDaysDisplay] = useState(false)
+    const [monthDisplay, setMonthDisplay] = useState(false)
+    const [dateSelected, setDateSelected] = useState()
+    const [eventSettings, setEventSettings] = useState([])
+    const [eventSettingsOff, setEventSettingsOff] = useState([]);
+    const [timesExclude, setTimeExclude] = useState([])
+    const [selectedTimeSlot, setSelectedTimeSlot] = useState();
+    const navigate = useNavigate();
 
 
     useEffect(() => {
-        if (rdvToUpdate) {
+        if (rdv) {
             setBouton("update")
-            console.log(rdvToUpdate._id)
-            setDateDebutRdv(rdvToUpdate.dateDebutRdv | "");
-            setDateFinRdv(rdvToUpdate.dateFinRdv | "");
+            setDateDebutRdv(rdv.dateDebutRdv);
+            setDateFinRdv(rdv.dateFinRdv);
         }
-    }, [rdvToUpdate]);
+    }, [rdv])
+
 
     ////////////////////// soumission formulaire ////////////////////
-    
-        const handleSubmit = async (e) => {
-            e.preventDefault();
 
-            if(!dateDebutRdv){
-                setErrorMessage("Choose valid appointment date")
-                return;
-            }
-            try {
-                if (rdvToUpdate) { 
-                    try {
-                        const response = await axios.put(
-                            `http://192.168.11.104:5000/api/rendez_vous/update/${rdvToUpdate._id}`,
-                            {
-                                dateDebutRdv,
-                                dateFinRdv,
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!dateDebutRdv) {
+            setErrorMessage("Choose valid appointment date")
+            return;
+        }
+        try {
+            if (rdv) {
+                try {
+                    const response = await axios.put(
+                        `${path}/api/rendez_vous/update/${rdv._id}`,
+                        {
+                            dateDebutRdv,
+                            dateFinRdv,
 
-                            }
-                        );
-
-                        if (response.status === 200) {
-                            const rdv = response.data;
-                            if (userData.role.includes('patient') && !userData.role.includes('admin')) { 
-                                fetchPatientRdvs(userData._id, updateRdvs)
-                            }
-                            else if (userData.role.includes('medecin') && !userData.role.includes('admin')) {
-                                fetchMedecinRdvs(userData._id, updateRdvs)
-                            }
-                            else {
-                                fetchRdvs(updateRdvs)
-                            }
-                            console.log("update rdv done :", rdv);
-                            setSuccessMessage("Updated successful!");
-                            setErrorMessage("");
-                            setModalIsOpen(false);
                         }
-                    } catch (error) {
-                        console.error("Erreur lors de l'enregistrement du rendez vous", error);
-                        setErrorMessage("Error during updating. Please try again.");
-                        setSuccessMessage("");
+                    );
 
-                    }
-
-                } else {
-                    try {
-                        const response = await axios.post(
-                            `http://192.168.11.104:5000/api/rendez_vous/${patient_id}/${doctor_id}`,
-                            {
-                                dateDebutRdv,
-                                dateFinRdv,
-                            }
-                        );
-
-                        if (response.status === 200) {
-                            const rdv = response.data;
-                            if (userData.role.includes('patient') && !userData.role.includes('admin')) {
-                                fetchPatientRdvs(userData._id, updateRdvs)
-                            }
-                            else if (userData.role.includes('medecin') && !userData.role.includes('admin')) {
-                                fetchMedecinRdvs(userData._id, updateRdvs)
-                            }
-                            else {
-                                fetchRdvs(updateRdvs)
-                            }
-                            console.log("Nouveau rdv enregistré :", rdv);
-                            setSuccessMessage("Registration successful!"); 
-                            setErrorMessage("");
-                            setModalIsOpen(false);
+                    if (response.status === 200) {
+                        const rdv = response.data;
+                        if (userData.role.includes('secretaire') && !userData.role.includes('admin')) {
+                            fetchPatientRdvs(path,userData._id, updateRdvs)
                         }
-                    } catch (error) {
-                        console.error("Erreur lors de l'enregistrement du rendez vous", error);
-                        setErrorMessage(error.response.data.message);
-                        setSuccessMessage("");
-
+                        else if (userData.role.includes('medecin') && !userData.role.includes('admin')) {
+                            fetchMedecinRdvs(path,userData._id, updateRdvs)
+                        }
+                        else {
+                            fetchRdvs(path,updateRdvs)
+                        }
+                        console.log("update rdv done :", rdv);
+                        setSuccessMessage("Updated successful!");
+                        navigate('/dashboard/rdv');
                     }
+                } catch (error) {
+                    console.error("Erreur lors de l'enregistrement du rendez vous", error);
+                    setErrorMessage("Error during updating. Please try again.");
+                    setSuccessMessage("");
+
                 }
-            } catch (error) {
 
-            } 
-        };
+            } else {
+                try {
+                    const response = await axios.post(
+                        `${path}/api/rendez_vous/${patient._id}/${doctorSelected._id}`,
+                        {
+                            dateDebutRdv,
+                            dateFinRdv,
+                        }
+                    );
 
-    const handleInputChange = (e) => {
-        const { name, value, type } = e.target;
-        switch (name) {
-            case "patient_id":
-                setPatient_id(value);
-                break;
-            default:
-                break;
+                    if (response.status === 200) {
+                        const rdv = response.data;
+                        if (userData.role.includes('secretaire') && !userData.role.includes('admin')) {
+                            fetchPatientRdvs(path,userData._id, updateRdvs)
+                        }
+                        else if (userData.role.includes('medecin') && !userData.role.includes('admin')) {
+                            fetchMedecinRdvs(path,userData._id, updateRdvs)
+                        }
+                        else {
+                            fetchRdvs(path,updateRdvs)
+                        }
+                        console.log("Nouveau rdv enregistré :", rdv);
+                        setSuccessMessage("Registration successful!");
+                        setErrorMessage("");
+                        navigate('/dashboard/rdv');
+                    }
+                } catch (error) {
+                    console.error("Erreur lors de l'enregistrement du rendez vous", error);
+                    setErrorMessage(error.response.data.message);
+                    setSuccessMessage("");
+
+                }
+            }
+        } catch (error) {
+
         }
     };
 
-    const closeModal = () => {
-        setModalIsOpen(false);
-    };
 
-    const handleCellClick = (args) => {
-        const _id = args.groupIndex
-        const targetDoctor = doctor.find(doc => doc.Id === _id);
-        setDoctor_id(targetDoctor._id)
-        setDateDebutRdv(args.startTime)
-        setDateFinRdv(args.endTime)
-        console.log("#########", targetDoctor._id)
-        console.log(args);
-    };
+    useEffect(() => {
+        const fetchDoctors = async () => {
+            const listDoctor = [];
+            for (let medecin of medecins) {
+                listDoctor.push({ value: `${medecin.tel}`, label: `${medecin.nom} ${medecin.prenom}` })
+            }
+            await setDoctors(listDoctor);
+        };
+        fetchDoctors();
+    }, [medecins]);
 
-
-    const handleCloseModal = () => {
-        setModalIsOpen(false);
+    const handlerdoctorSelected = async (docSelected) => {
+        for (let medecin of medecins) {
+            if (medecin.tel == docSelected.value) {
+                setEventSettingsOff(daysOff[medecin.tel])
+                setEventSettings(medecinRdvs[medecin.tel])
+                setDoctorSelected(medecin)
+                setMonthDisplay(true)
+                setDaysDisplay(false)
+            }
+        }
+        console.log("eventSettings : ", eventSettings)
+        console.log("eventSettingsOff : ", eventSettingsOff)
     }
 
- 
-    const eventSettings = { dataSource: rdvs }
-    const group = { allowGroupEdit: true, resources: ['RendezVous'] }
+
+
+    const handleCellClick = async (event,args) => {
+        event.preventDefault();
+        const today = new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()).getTime();
+        const ChooseDate = new Date(new Date(args).getFullYear(),new Date(args).getMonth(args),new Date(args).getDate()).getTime();
+        console.log("times 1 : ",today," times 2 : ", ChooseDate)
+        if(ChooseDate<today){
+            alert("Please choose a valid date");
+            return;
+        }
+        const formatDate2 = `${new Date(args).getFullYear()}${new Date(args).getMonth()}${new Date(args).getDate()}`
+        setDateSelected(new Date(args))
+        const excludeTimeList = []
+        for (let day of eventSettings) {
+            const formatDate1 = `${new Date(day.StartTime).getFullYear()}${new Date(day.StartTime).getMonth()}${new Date(day.StartTime).getDate()}`
+            if (formatDate2 == formatDate1) {
+                const formatTime = `${new Date(day.StartTime).getHours().toString().padStart(2, '0')}:${new Date(day.StartTime).getMinutes().toString().padStart(2, '0')}`
+                excludeTimeList.push(formatTime)
+            }
+        }
+        setTimeExclude(excludeTimeList)
+        setDateSelected(args)
+        setDaysDisplay(true)
+        setMonthDisplay(false)
+    };
+
+    function MonthButtonGroup({ daysOff }) {
+        const [daysOfMonth, setDaysOfMonth] = useState([]);
+        const monthNames = [
+            "January",
+            "February",
+            "March", 
+            "April", 
+            "May", 
+            "June", 
+            "July", 
+            "August", 
+            "September", 
+            "October", 
+            "November", 
+            "December"
+        ];
+
+        useEffect(() => {
+            const today = new Date();
+            const firstDayOfMonth = startOfMonth(today);
+            const lastDayOfMonth = endOfMonth(today);
+            const listDate = []
+            const days = eachDayOfInterval({ start: firstDayOfMonth, end: lastDayOfMonth });
+            for (let day of days) {
+                const formatDay = `${new Date(day).getFullYear()}${new Date(day).getMonth()}${new Date(day).getDate()}`
+                if (!daysOff.includes(formatDay)) {
+                    listDate.push(day)
+                }
+                // console.log(formatDay)
+            }
+            setDaysOfMonth(listDate);
+        }, []);
+
+        return (
+            <div className="button-container">
+                <h2 className="day-title">Days of the Month ({monthNames[new Date().getMonth()]})</h2>
+                <div className="button-group">
+                    {daysOfMonth.map((day) => (
+                        <button key={day} className="day-button" onClick={(event) => handleCellClick(event,day)}>
+                            {format(day, "dd")}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    function generateTimeSlots() {
+        const timeSlots = [];
+        let currentHour = 6;
+        let currentMinute = 0;
+        while (currentHour <= 17 || (currentHour === 17 && currentMinute <= 30)) {
+            const formattedHour = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+            if (!timesExclude.includes(formattedHour)) {
+                timeSlots.push(formattedHour);
+            }
+            currentMinute += 30;
+            if (currentMinute === 60) {
+                currentMinute = 0;
+                currentHour += 1;
+            }
+        }
+
+        return timeSlots;
+    };
+
+    function TimeSlotPicker() {
+        const timeSlots = generateTimeSlots();
+
+        const handleTimeSlotClick = async (event, timeSlot) => {
+            event.preventDefault()
+            const heure = timeSlot.split(':')
+            await setSelectedTimeSlot(timeSlot);
+            console.log("====> : ", heure)
+            const formatDate = new Date(
+                dateSelected.getFullYear(),
+                dateSelected.getMonth(),
+                dateSelected.getDate(),
+                parseInt(heure[0]),
+                parseInt(heure[1]))
+
+            await setDateDebutRdv(formatDate)
+            const formatDate2 = new Date(formatDate);
+            await formatDate2.setMinutes(formatDate.getMinutes() + 30)
+            await setDateFinRdv(formatDate2)
+
+            console.log(selectedTimeSlot)
+        };
+        console.log("debut : ", dateDebutRdv, " Fin : ", dateFinRdv)
+        return (
+            <div className="hour-container">
+                <h2 className="hour-title">Choose a time slot</h2>
+                <div>
+                    {timeSlots.map((timeSlot, index) => (
+                        <button
+                            key={index}
+                            onClick={(event) => handleTimeSlotClick(event, timeSlot)}
+                            className={selectedTimeSlot === timeSlot ? 'selected' : 'notSelected'}
+                        >
+                            {timeSlot}
+                        </button>
+                    ))}
+                </div>
+                <p>Selected timeslot : {selectedTimeSlot || 'Aucun'}</p>
+            </div>
+        );
+    };
+
+
     return (
-        <Modal show={modalIsOpen} onHide={handleCloseModal} contentClassName="custom-modal-content" size="lg">
+        <div className="main-container-rdv">
             <form onSubmit={handleSubmit}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Appointment form</Modal.Title>
-                </Modal.Header>
-                <Modal.Body style={{ width: '100%' }}>
-                    {successMessage && <p className="success-message" style={{textAlign:'center'}}>{successMessage}</p>}
-                    {errorMessage && <p className="error-message" style={{textAlign:'center'}}>{errorMessage}</p>}
-                    {!rdvToUpdate && <div className="form-field">
-                        <label>Patient</label>
-                        <select name="patient_id" value={patient_id} onChange={handleInputChange} style={{width:'200px', borderRadius:'10px'}} required>
-                            <option value="">choose a patient</option>
-                            {patients.map((patient) => (
-                                <option key={patient._id} value={patient._id}>
-                                    {patient.nom} {patient.prenom}
-                                </option>
-                            ))}
-                        </select>
-                    </div>}
+                <div className=" rdv-container">
+                    <div className="title-container">
+                        <h2 className="title-rdv">APPOITMENT FORM</h2>
+                    </div>
+                    {successMessage && <p className="success-message" style={{ textAlign: 'center' }}>{successMessage}</p>}
+                    {errorMessage && <p className="error-message" style={{ textAlign: 'center' }}>{errorMessage}</p>}
                     <div className="form-field">
-                        <ScheduleComponent
-                            width='100%'
-                            height='550px'
-                            margin='auto'
-                            selectedDate={new Date()}
-                            currentView='TimelineWeek'
-                            eventSettings={eventSettings}
-                            group={group}
-                            cellClick={handleCellClick}>
-                            <ViewsDirective>
-                                <ViewDirective option='Week' />
-                                <ViewDirective option='Month' />
-                                <ViewDirective option='TimelineWeek' />
-                                <ViewDirective option='TimelineMonth' />
-                                <ViewDirective option='Agenda' />
-                            </ViewsDirective>
-                            <ResourcesDirective>
-                                <ResourceDirective 
-                                field='DoctorId' 
-                                title='Rendez-vous' 
-                                name='RendezVous' 
-                                allowMultiple={true} 
-                                dataSource={doctor} 
-                                textField='Text' 
-                                idField='Id' 
-                                colorField='Color'
-                                workDaysField='IsWorkDay'
-                                >
-                                </ResourceDirective>
-                            </ResourcesDirective>
-                            <Inject services={[Week, Month, TimelineViews, TimelineMonth, Agenda]} />
-                        </ScheduleComponent>
+                        <h4>Choose a Doctor </h4>
+                        <Select
+                            options={doctors}
+                            value={doctor}
+                            onChange={(selectedDoctor) => handlerdoctorSelected(selectedDoctor)}
+                            isSearchable
+                            placeholder="Select a doctor..."
+                        />
 
                     </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseModal}>
-                        Close
-                    </Button>
-                    <Button id="sub_btn" type="submit">
-                        {bouton}
-                    </Button>
-                </Modal.Footer>
+                    <div className="form-field">
+                        {/* {monthDisplay && <ScheduleComponent height="400px" currentView="Month" eventSettings={{ dataSource: eventSettingsOff, allowAdding: false, allowDeleting: false }} cellClick={handleCellClick}>
+                        <Inject services={[Month]} />
+                    </ScheduleComponent>} */}
+                        {monthDisplay && <MonthButtonGroup daysOff={doublons[doctorSelected.tel]} />}
+                    </div>
+                    <div>
+                        {/* {daysDisplay && <ScheduleComponent height="1300px" selectedDate={dateSelected} eventSettings={{ dataSource: eventSettings }} cellClick={handleCellClick2}>
+                        <Inject services={[Day]} />
+                    </ScheduleComponent>} */}
+                        {daysDisplay && <TimeSlotPicker />}
+                    </div>
+                    <div className="form-field btn-rdv">
+                        <Button id="sub_btn" type="submit">
+                            {bouton}
+                        </Button>
+                    </div>
+                </div>
             </form>
-        </Modal>
+        </div>
     );
 }
 

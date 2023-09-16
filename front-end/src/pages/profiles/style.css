@@ -36,3 +36,10 @@
     display:flex
   }
   
+  .tabHead{
+    display: contents;
+  }
+
+  .case{
+    min-width: 150px;
+  }

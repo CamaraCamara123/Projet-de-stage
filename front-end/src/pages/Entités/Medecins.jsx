@@ -3,7 +3,7 @@ import DashboardHeader from '../../components/DashboardHeader';
 
 import { calculateRange, sliceData } from '../../utils/table-pagination';
 
-import '../styles.css';
+import './style.css';
 import { useUserData } from '../../contexts/UserDataContext';
 import NotificationIcon from '../../assets/icons/notification.svg';
 import SettingsIcon from '../../assets/icons/settings.svg';
@@ -32,7 +32,7 @@ function Medecins() {
   const [modalIsOpen4, setModalIsOpen4] = useState(false);
   const [modalIsOpen5, setModalIsOpen5] = useState(false);
   const { medecin, updateMedecin, updatePatient, updateSecretaire, isPatient, isMedecin } = useUserData()
-  const { userData } = useUserData();
+  const { userData, path } = useUserData();
 
   updatePatient(null);
   updateSecretaire(null);
@@ -55,7 +55,8 @@ function Medecins() {
       let search_results = medecins.filter(
         (medecin) =>
           medecin.nom.toLowerCase().includes(search.toLowerCase()) ||
-          medecin.prenom.toLowerCase().includes(search.toLowerCase())
+          medecin.prenom.toLowerCase().includes(search.toLowerCase())||
+          medecin.tel.toLowerCase().includes(search.toLowerCase())
       );
       setFilteredMedecins(search_results);
     } else {
@@ -70,18 +71,17 @@ function Medecins() {
   };
 
   const fupdate = (user_id) => {
-    fetchMedecin(user_id, updateMedecin);
+    fetchMedecin(path,user_id, updateMedecin);
     modalIsOpen2 ? setModalIsOpen2(false) : setModalIsOpen2(true);
   }
 
   const fdelete = (user_id) => {
-    fetchMedecin(user_id, updateMedecin);
+    fetchMedecin(path,user_id, updateMedecin);
     modalIsOpen3 ? setModalIsOpen3(false) : setModalIsOpen3(true);
   }
 
   const fview = (user_id) => {
-    console.log(user_id)
-    fetchMedecin(user_id, updateMedecin);
+    fetchMedecin(path,user_id, updateMedecin);
     if (medecin && medecin._id == user_id) {
       modalIsOpen4 ? setModalIsOpen4(false) : setModalIsOpen4(true);
     }
@@ -90,7 +90,7 @@ function Medecins() {
   const fmesRdvs = (user_id) => {
     isPatient(true)
     isMedecin(false)
-    fetchMedecinRdvs(user_id, updateRdvs);
+    fetchMedecinRdvs(path,user_id, updateRdvs);
     modalIsOpen5 ? setModalIsOpen5(false) : setModalIsOpen5(true);
   }
 
@@ -105,7 +105,7 @@ function Medecins() {
           setModalIsOpen3(false)
           setModalIsOpen5(false)
           openModal()
-          }}>New Medecin</button>
+          }}>New Doctor</button>
         <div className='dashbord-header-right'>
           <img
             src={NotificationIcon}
@@ -172,7 +172,7 @@ function Medecins() {
                     {userData.role.includes('admin') &&
                       <>
                         <span>
-                          <button className='btn btn-success' onClick={() => {
+                          <button className='elt-btn btn elt-btn-success' onClick={() => {
                             setModalIsOpen(false)
                             setModalIsOpen4(false)
                             setModalIsOpen2(false)
@@ -185,7 +185,7 @@ function Medecins() {
                           </button>
                         </span>
                         <span>
-                          <button className='btn btn-danger display-flex' onClick={() => {
+                          <button className='elt-btn btn btn-danger display-flex' onClick={() => {
                             setModalIsOpen(false)
                             setModalIsOpen4(false)
                             setModalIsOpen2(false)
@@ -199,7 +199,7 @@ function Medecins() {
                       </>
                     }
                     <span>
-                      <button className='btn btn-primary' onClick={() => {
+                      <button className='elt-btn btn btn-primary' onClick={() => {
                         setModalIsOpen(false)
                         setModalIsOpen4(false)
                         setModalIsOpen2(false)
@@ -211,8 +211,8 @@ function Medecins() {
                       </button>
                     </span>
                     <span>
-                      <button className='btn btn-warning' onClick={() => fmesRdvs(medecin._id)}>
-                        <FontAwesomeIcon icon={faHouseMedicalFlag} />
+                      <button className='elt-btn btn btn-warning' onClick={() => fmesRdvs(medecin._id)}>
+                        <FontAwesomeIcon icon={faHouseMedicalFlag}/>
                       </button>
                     </span>
                   </td>

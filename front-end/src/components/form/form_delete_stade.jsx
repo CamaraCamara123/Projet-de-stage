@@ -10,27 +10,22 @@ function Form_delete_stade({ open, stadeToDelete }) {
     const [modalIsOpen, setModalIsOpen] = useState(open);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const { updatestades, medecin, patient } = useUserData()
-
-
-
-    const closeModal = () => {
-        setModalIsOpen(false);
-    };
+    const { updateStades, path } = useUserData()
 
     const onDelete = () => {
         setModalIsOpen(false);
-        return <Navigate to='/dashboard' />
     }
     const handleDelete = async () => {
         try {
+            const token = localStorage.getItem('token');
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             const response = await axios.delete(
-                `http://192.168.11.104:5000/api/maladie/stade/delete/${stadeToDelete._id}`
+                `${path}/api/maladie/stade/delete/${stadeToDelete._id}`
             );
 
             if (response.status === 200) {
 
-                fetchStadeMaladie(stadeToDelete.maladie._id,updatestades)
+                fetchStadeMaladie(path, stadeToDelete.maladie._id, updateStades)
                 setSuccessMessage("stade deleted successfully!");
                 setErrorMessage("");
                 onDelete();

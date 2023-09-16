@@ -11,27 +11,16 @@ import '@syncfusion/ej2-react-dropdowns/styles/material.css';
 import '@syncfusion/ej2-react-inputs/styles/material.css';
 import '@syncfusion/ej2-react-popups/styles/material.css';
 import '@syncfusion/ej2-react-schedule/styles/material.css';
-import { fetchConsultationsRdv } from "../fetchElement/fetchConsultations";
+import { fetchConsultationDiagnostic } from "../fetchElement/fetchDiagnostic";
 
-function Form_valide_diagnostic({ open, consult }) {
+function Form_valide_diagnostic({ open, diagnostic }) {
     const [modalIsOpen, setModalIsOpen] = useState(open);
     const [maladie_id, setMaladie_id] = useState();
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const { updateConsultations, maladies, maladie, medecins, userData } = useUserData();
+    const { updateDiagnostics, path } = useUserData();
     const [bouton, setBouton] = useState("Confirm");
 
-
-
-
-    // useEffect(() => {
-    //     if (consult) {
-    //         setBouton("update")
-    //         console.log(consult._id)
-    //         setDateDebutRdv(consult.dateDebutRdv | "");
-    //         setDateFinRdv(consult.dateFinRdv | "");
-    //     }
-    // }, [consult]);
 
     ////////////////////// soumission formulaire ////////////////////
 
@@ -40,7 +29,7 @@ function Form_valide_diagnostic({ open, consult }) {
 
         try {
             const response = await axios.put(
-                `http://192.168.11.104:5000/api/diagnostic/validation/${consult._id}/${maladie_id}`,
+                `${path}/api/diagnostic/validation/${diagnostic._id}/${maladie_id}`,
                 {
 
                 }
@@ -48,7 +37,7 @@ function Form_valide_diagnostic({ open, consult }) {
 
             if (response.status === 200) {
                 console.log("Diagnostic validated successfully :");
-                fetchConsultationsRdv(consult.rdv._id, updateConsultations);
+                fetchConsultationDiagnostic(path,diagnostic.consultation._id, updateDiagnostics);
                 setSuccessMessage("wait please ......");
                 setErrorMessage("");
                 setModalIsOpen(false);
@@ -92,11 +81,11 @@ function Form_valide_diagnostic({ open, consult }) {
                                 <div className="form-field">
                                     <label>SELECT THE CORRECT DISEASE</label>
                                     <select name="maladie_id" value={maladie_id} onChange={handleInputChange} 
-                                    style={{width:"150px"}} required>
+                                    style={{width:"200px", justifyContent:'initial',fontSize:'20px',color:'gray'}} required>
                                         <option value="">choose</option>
-                                        {maladies.map((maladie) => (
+                                        {diagnostic.maladies.map((maladie,index) => (
                                             <option key={maladie._id} value={maladie._id}>
-                                                {maladie.nom} {maladie.prenom}
+                                                <span>{maladie.nom}</span> ========= <span>{diagnostic.probabilities[index]}%</span>
                                             </option>
                                         ))}
                                     </select>
@@ -108,8 +97,8 @@ function Form_valide_diagnostic({ open, consult }) {
                                 <Card>
                                     <Card.Header>DISEASE DETECTED BY THE ALGORTHM</Card.Header>
                                     <Card.Body>
-                                        <span>PREDICATED DISEASE : </span>{consult.maladie.nom} <br />
-                                        CONFIDENCE :{consult.probability}% == {(consult.probability >= 70) ? "High" : "LOW"}
+                                        <span>PREDICATED DISEASE : </span>{diagnostic.maladie.nom} <br />
+                                        CONFIDENCE :{diagnostic.probability}% == {(diagnostic.probability >= 70) ? "High" : "LOW"}
                                     </Card.Body>
                                 </Card>
                             </Col>

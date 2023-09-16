@@ -44,7 +44,7 @@ class Onboarding extends React.Component {
                 </Block>
                 <Block style={styles.subTitle}>
                   <Text color="white" size={16}>
-                    Fully coded React Native components.
+                    Dermatology Mobile App.
                   </Text>
                 </Block>
               </Block>

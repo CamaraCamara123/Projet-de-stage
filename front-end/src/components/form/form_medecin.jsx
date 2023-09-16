@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button } from 'react-bootstrap';
 import axios from "axios";
 import "./form.css";
-import { Link, Navigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { useUserData } from "../../contexts/UserDataContext";
 import { fetchMedecins } from "../fetchElement/fetchMedecins";
 
@@ -20,9 +20,10 @@ function Form_Medecin({ open, medecinToUpdate }) {
     const [genre, setGenre] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const {updateMedecins} = useUserData()
+    const { updateMedecins, path} = useUserData()
     const [msgError, setMsgError] = useState("")
     const [bouton, setBouton] = useState("save")
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -48,14 +49,15 @@ function Form_Medecin({ open, medecinToUpdate }) {
         try {
             const formData = new FormData();
             formData.append("image", photo);
-
+            const token = localStorage.getItem('token');
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             const response2 = await axios.put(
-                `http://192.168.11.104:5000/api/users/user/upload-image/${username}`,
+                `${path}/api/users/user/upload-image/${username}`,
                 formData
             );
 
             if (response2.status === 200) {
-                fetchMedecins(updateMedecins)
+                fetchMedecins(path, updateMedecins)
                 setSuccessMessage("Image Registration successful!");
                 setErrorMessage("");
             }
@@ -77,9 +79,10 @@ function Form_Medecin({ open, medecinToUpdate }) {
             }
             if (medecinToUpdate) {
                 try {
-                    console.log(tel, genre);
+                    const token = localStorage.getItem('token');
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                     const response = await axios.put(
-                        `http://192.168.11.104:5000/api/users/dermatologue/${medecinToUpdate._id}`,
+                        `${path}/api/users/dermatologue/${medecinToUpdate._id}`,
                         {
                             username,
                             nom,
@@ -91,28 +94,26 @@ function Form_Medecin({ open, medecinToUpdate }) {
                     );
 
                     if (response.status === 200) {
-                        const patient = response.data;
-                        console.log("update medecin done :", patient);
                         setSuccessMessage("Updated successful!");
                         setErrorMessage("");
-                        fetchMedecins(updateMedecins);
+                        fetchMedecins(path, updateMedecins);
                         if (photo) {
                             handlePhoto(photo, username);
                         }
                         setModalIsOpen(false);
-                        <Navigate to='/dashboard/' />
                     }
                 } catch (error) {
                     console.error("Erreur lors de l'enregistrement du medecin", error);
                     setErrorMessage(error.response.data.message);
                     setSuccessMessage("");
-
                 }
 
             } else {
                 try {
+                    const token = localStorage.getItem('token');
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                     const response = await axios.post(
-                        "http://192.168.11.104:5000/api/users/dermatologue/create",
+                        `${path}/api/users/dermatologue/create`,
                         {
                             username,
                             password,
@@ -126,11 +127,9 @@ function Form_Medecin({ open, medecinToUpdate }) {
                     );
 
                     if (response.status === 201) {
-                        const medecin = response.data;
-                        console.log("Nouveau medecin enregistré :", medecin._id);
                         setSuccessMessage("Registration successful!");
                         setErrorMessage("");
-                        fetchMedecins(updateMedecins);
+                        fetchMedecins(path, updateMedecins);
                         if (photo) {
                             handlePhoto(photo, username);
                         }
@@ -140,7 +139,6 @@ function Form_Medecin({ open, medecinToUpdate }) {
                     console.error("Erreur lors de l'enregistrement du medecin", error);
                     setErrorMessage(error.response.data.message);
                     setSuccessMessage("");
-
                 }
             }
         } catch (error) {
@@ -185,28 +183,19 @@ function Form_Medecin({ open, medecinToUpdate }) {
                 break;
         }
     };
-
-    const openModal = () => {
-        setModalIsOpen(true);
-    };
-
-    const closeModal = () => {
-        setModalIsOpen(false);
-    };
-
     const handleCloseModal = () => {
         setModalIsOpen(false);
     }
 
     return (
         <Modal show={modalIsOpen} onHide={handleCloseModal}>
-        <form onSubmit={handleSubmit}>
-            <Modal.Header closeButton>
-                <Modal.Title>Doctor’s form</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                {successMessage && <p className="success-message">{successMessage}</p>}
-                {errorMessage && <p className="error-message">{errorMessage}</p>}
+            <form onSubmit={handleSubmit}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Doctor’s form</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {successMessage && <p className="success-message">{successMessage}</p>}
+                    {errorMessage && <p className="error-message">{errorMessage}</p>}
                     <div className="form-field">
                         <label>FIRST NAME</label>
                         <input
@@ -308,15 +297,15 @@ function Form_Medecin({ open, medecinToUpdate }) {
                             required
                         />
                     </div>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseModal}>
-                    Close
-                </Button>
-                <Button id="sub_btn" type="submit">
-                    {bouton}
-                </Button>
-            </Modal.Footer>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                    <Button id="sub_btn" type="submit">
+                        {bouton}
+                    </Button>
+                </Modal.Footer>
             </form>
         </Modal>
     );

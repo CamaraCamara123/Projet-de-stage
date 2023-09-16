@@ -21,7 +21,7 @@ function Form({ open, patientToUpdate }) {
   const [genre, setGenre] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const {updatePatients} = useUserData()
+  const { updatePatients, path } = useUserData()
   const [msgError, setMsgError] = useState("")
   const [bouton, setBouton] = useState("save")
 
@@ -52,12 +52,12 @@ function Form({ open, patientToUpdate }) {
       formData.append("image", photo);
 
       const response2 = await axios.put(
-        `http://192.168.11.104:5000/api/users/user/upload-image/${username}`,
+        `${path}/api/users/user/upload-image/${username}`,
         formData
       );
 
       if (response2.status === 200) {
-        fetchPatients(updatePatients)
+        fetchPatients(path, updatePatients)
         setSuccessMessage("Image Registration successful!");
         setErrorMessage("");
       }
@@ -81,7 +81,7 @@ function Form({ open, patientToUpdate }) {
         console.log(birthdate)
         try {
           const response = await axios.put(
-            `http://192.168.11.104:5000/api/users/patient/update/${patientToUpdate._id}`,
+            `${path}/api/users/patient/update/${patientToUpdate._id}`,
             {
               username,
               adresse,
@@ -94,9 +94,7 @@ function Form({ open, patientToUpdate }) {
           );
 
           if (response.status === 200) {
-            const patient = response.data;
-            fetchPatients(updatePatients)
-            console.log("update patient done :", patient);
+            fetchPatients(path, updatePatients)
             setSuccessMessage("Updated successful!");
             setErrorMessage("");
             if (photo) {
@@ -113,8 +111,10 @@ function Form({ open, patientToUpdate }) {
 
       } else {
         try {
+          const token = localStorage.getItem('token');
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           const response = await axios.post(
-            "http://192.168.11.104:5000/api/users/patient/create",
+            `${path}/api/users/patient/create`,
             {
               username,
               password,
@@ -130,15 +130,14 @@ function Form({ open, patientToUpdate }) {
 
           if (response.status === 201) {
             const patient = response.data;
-            fetchPatients(updatePatients);
+            fetchPatients(path, updatePatients);
             console.log("Nouveau patient enregistré :", patient);
             setSuccessMessage("Registration successful!");
             setErrorMessage("");
-            if(photo){
+            if (photo) {
               handlePhoto(photo, username);
             }
             setModalIsOpen(false);
-            // <Navigate to='/dashboard' />
           }
         } catch (error) {
           console.error("Erreur lors de l'enregistrement du client", error);
@@ -157,7 +156,7 @@ function Form({ open, patientToUpdate }) {
     const { name, value, type, files } = e.target;
 
     switch (name) {
-      case "username": 
+      case "username":
         setUsername(value);
         break;
       case "password":
@@ -194,13 +193,6 @@ function Form({ open, patientToUpdate }) {
     }
   };
 
-  const openModal = () => {
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
 
   const handleCloseModal = () => {
     setModalIsOpen(false);
@@ -208,13 +200,13 @@ function Form({ open, patientToUpdate }) {
 
   return (
     <Modal show={modalIsOpen} onHide={handleCloseModal}>
-    <form onSubmit={handleSubmit}>
-      <Modal.Header closeButton>
-        <Modal.Title>Patient form</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {successMessage && <p className="success-message">{successMessage}</p>}
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
+      <form onSubmit={handleSubmit}>
+        <Modal.Header closeButton>
+          <Modal.Title>Patient form</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {successMessage && <p className="success-message">{successMessage}</p>}
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="form-field">
             <label>FIRST NAME</label>
             <input
@@ -266,20 +258,22 @@ function Form({ open, patientToUpdate }) {
 
           {!patientToUpdate && <>
             <div className="form-field">
-              <label>PASSWORD</label>
+              <label for='password'>PASSWORD</label>
               <input
                 type="text"
                 name="password"
+                id="password"
                 value={password}
                 onChange={handleInputChange}
                 required
               />
             </div>
             <div className="form-field">
-              <label>CONFIRMATION</label>
+              <label for='confirmation'>CONFIRMATION</label>
               <input
                 type="text"
                 name="confirmPassword"
+                id="confirmation"
                 value={confirmPassword}
                 onChange={handleInputChange}
                 required
@@ -288,21 +282,23 @@ function Form({ open, patientToUpdate }) {
             </div>
           </>}
           <div className="form-field">
-            <label>PHONE</label>
+            <label for='phone'>PHONE</label>
             <input
               type="tel"
               name="tel"
+              id="phone"
               value={tel}
               onChange={handleInputChange}
               required
             />
           </div>
           <div className="form-field">
-            <label>IMAGE</label>
+            <label for='image'>IMAGE</label>
             <input
               type="file"
               name="photo"
               accept="image/*"
+              id="image"
               onChange={handleInputChange}
             />
           </div>
@@ -316,15 +312,15 @@ function Form({ open, patientToUpdate }) {
               required
             />
           </div>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleCloseModal}>
-          Close
-        </Button>
-        <Button id="sub_btn" type="submit">
-          {bouton}
-        </Button>
-      </Modal.Footer>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+          <Button id="sub_btn" type="submit">
+            {bouton}
+          </Button>
+        </Modal.Footer>
       </form>
     </Modal>
   );

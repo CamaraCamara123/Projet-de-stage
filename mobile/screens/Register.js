@@ -21,7 +21,7 @@ const Register = (props)=> {
   const { login, isLoggedIn } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { updateUserData } = useUserData();
+  const { updateUserData, path } = useUserData();
   const navigation = useNavigation();
 
   // if (AsyncStorage.getItem('token')) {
@@ -31,7 +31,7 @@ const Register = (props)=> {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://192.168.11.104:5000/login', {
+      const response = await axios.post(`${path}/login`, {
         username,
         password,
       });

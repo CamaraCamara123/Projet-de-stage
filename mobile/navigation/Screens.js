@@ -1,31 +1,21 @@
 import { Animated, Dimensions, Easing } from "react-native";
 // header for screens
 import { Header, Icon } from "../components";
-import { argonTheme, tabs } from "../constants";
 
-import Articles from "../screens/Articles";
-import { Block } from "galio-framework";
 // drawer
 import CustomDrawerContent from "./Menu";
-import Elements from "../screens/Elements";
 // screens
 import Home from "../screens/Home";
 import Onboarding from "../screens/Onboarding";
-import Pro from "../screens/Pro";
 import Profile from "../screens/Profile";
 import React from "react";
 import Register from "../screens/Register";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
-import { fetchMedecinRdvs } from "../components/fetchElement/fetchRdvs";
-import { fetchConsultations } from "../components/fetchElement/fetchConsultation";
-import { fetchMaladies } from "../components/fetchElement/fetchMaladies";
-import { useUserData } from "../contexts/useUserData";
-import { useAuth } from "../contexts/useAuth";
-import { AsyncStorage } from 'react-native';
-import New_consultation from "../screens/New_consultation";
-import Consultations from "../screens/Consultations";
+import New_Diagnostic from "../screens/New_Diagnostic";
+import Diagnostics from "../screens/Diagnostics";
+import Details_diagnostic from "../screens/Details_diagnostic";
 
 const { width } = Dimensions.get("screen");
 
@@ -33,44 +23,44 @@ const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
-function ElementsStack(props) {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        mode: "card",
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen
-        name="Elements"
-        component={Elements}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header title="Elements" navigation={navigation} scene={scene} />
-          ),
-          cardStyle: { backgroundColor: "#F8F9FE" },
-        }}
-      />
-      <Stack.Screen
-        name="Pro"
-        component={Pro}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title=""
-              back
-              white
-              transparent
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          headerTransparent: true,
-        }}
-      />
-    </Stack.Navigator>
-  );
-}
+// function ElementsStack(props) {
+//   return (
+//     <Stack.Navigator
+//       screenOptions={{
+//         mode: "card",
+//         headerShown: false,
+//       }}
+//     >
+//       <Stack.Screen
+//         name="Elements"
+//         component={Elements}
+//         options={{
+//           header: ({ navigation, scene }) => (
+//             <Header title="Elements" navigation={navigation} scene={scene} />
+//           ),
+//           cardStyle: { backgroundColor: "#F8F9FE" },
+//         }}
+//       />
+//       {/* <Stack.Screen
+//         name="Pro"
+//         component={Pro}
+//         options={{
+//           header: ({ navigation, scene }) => (
+//             <Header
+//               title=""
+//               back
+//               white
+//               transparent
+//               navigation={navigation}
+//               scene={scene}
+//             />
+//           ),
+//           headerTransparent: true,
+//         }}
+//       /> */}
+//     </Stack.Navigator>
+//   );
+// }
 
 // function ArticlesStack(props) {
   
@@ -138,7 +128,7 @@ function ProfileStack(props) {
           headerTransparent: true,
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Pro"
         component={Pro}
         options={{
@@ -154,7 +144,7 @@ function ProfileStack(props) {
           ),
           headerTransparent: true,
         }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 }
@@ -173,7 +163,7 @@ function HomeStack(props) {
         options={{
           header: ({ navigation, scene }) => (
             <Header
-              title="APPOITMENTS"
+              title="Visits"
               navigation={navigation}
               scene={scene}
             />
@@ -182,8 +172,8 @@ function HomeStack(props) {
         }}
       />
       <Stack.Screen
-        name="New_consultation"
-        component={New_consultation}
+        name="New_Diagnostic"
+        component={New_Diagnostic}
         options={{
           header: ({ navigation, scene }) => (
             <Header
@@ -199,8 +189,25 @@ function HomeStack(props) {
         }}
       />
       <Stack.Screen
-        name="consultations"
-        component={Consultations}
+        name="diagnostics"
+        component={Diagnostics}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              title=""
+              back
+              black
+              transparent
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="details_diagnostic"
+        component={Details_diagnostic}
         options={{
           header: ({ navigation, scene }) => (
             <Header
@@ -311,13 +318,13 @@ function AppStack(props) {
           headerShown: false,
         }}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Elements"
         component={ElementsStack}
         options={{
           headerShown: false,
         }}
-      />
+      /> */}
       {/* <Drawer.Screen
         name="Articles"
         component={ArticlesStack}

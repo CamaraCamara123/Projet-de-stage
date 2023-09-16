@@ -20,7 +20,7 @@ const thumbMeasure = (width - 48 - 32) / 3;
 
 const Profile =()=> {
 
-  const {userData} = useUserData()
+  const {userData,path} = useUserData()
     return (
       <Block flex style={styles.profile}>
         <Block flex>
@@ -36,7 +36,7 @@ const Profile =()=> {
               <Block flex style={styles.profileCard}>
                 <Block middle style={styles.avatarContainer}>
                   <Image
-                    source={{ uri: Images.ProfilePicture }}
+                    source={{ uri: `${path}/uploads/${userData.photo}` }}
                     style={styles.avatar}
                   />
                 </Block>

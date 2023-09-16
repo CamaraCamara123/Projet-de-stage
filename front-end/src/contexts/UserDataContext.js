@@ -11,7 +11,6 @@ export function useUserData() {
 // Composant Provider pour envelopper l'application et fournir les données utilisateur
 export function UserDataProvider({ children }) {
 
-  
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const [userData, setUserData] = useState(null);
@@ -50,6 +49,11 @@ export function UserDataProvider({ children }) {
 
   const [doctor_agenda, setDoctor_agenda] = useState([])
   const [agenda, setAgenda] = useState([])
+  const [medecinRdvs, setMedecinRdvs] = useState([])
+  const [daysOff, setDaysOff] = useState([])
+  const [doublons, setDoublons] = useState([])
+  const [path, setPath] = useState("http://192.168.11.104:5000");
+
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -122,6 +126,10 @@ export function UserDataProvider({ children }) {
     setRdv(data)
   }
 
+  const updateMedecinRdvs = (data) => {
+    setMedecinRdvs(data)
+  }
+
   const isPatient = (data)=>{
     setBoolPatient(data)
   }
@@ -141,6 +149,14 @@ export function UserDataProvider({ children }) {
   }
   const updateAgenda = (data) => {
     setAgenda(data)
+  }
+
+  const updateDaysOff = (data)=>{
+    setDaysOff(data)
+  }
+
+  const updateDoublons = (data)=>{
+    setDoublons(data)
   }
 
 
@@ -171,7 +187,11 @@ export function UserDataProvider({ children }) {
         diagnostics,updateDiagnostics,
         diagnostic,updateDiagnostic,
         doctor_agenda, updatedDoctor_agenda,
-        agenda,updateAgenda
+        agenda,updateAgenda,
+        medecinRdvs,updateMedecinRdvs,
+        daysOff, updateDaysOff,
+        doublons,updateDoublons,
+        path
       }}>
       {children}
     </UserDataContext.Provider>

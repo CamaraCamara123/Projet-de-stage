@@ -1,0 +1,17 @@
+.elt-btn{
+    width: 9px;
+    height: auto;
+    font-size:6px;
+    justify-content: center;
+    margin-right: 1px ;
+}
+
+.elt-btn:hover{
+    border-radius: 20%;
+    color: black;
+}
+.tabHead{
+    display: contents;
+  }
+
+  

@@ -1,10 +1,10 @@
 import axios from "axios";
 
-export const fetchStade = async (stade_id,updateStade) => {
+export const fetchStade = async (path,stade_id,updateStade) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get(`http://192.168.11.104:5000/api/stade/${stade_id}`, {
+      const response = await axios.get(`${path}/api/stade/${stade_id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -16,11 +16,11 @@ export const fetchStade = async (stade_id,updateStade) => {
     }
   };
 
-  export const fetchStadeMaladie = async (maladie_id,updateStades) => {
+  export const fetchStadeMaladie = async (path,maladie_id,updateStades) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get(`http://192.168.11.104:5000/api/maladie/stades/${maladie_id}`, {
+      const response = await axios.get(`${path}/api/maladie/stades/${maladie_id}`, {
         headers: {
           'Content-Type': 'application/json'
         }

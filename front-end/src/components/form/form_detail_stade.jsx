@@ -4,7 +4,7 @@ import { useUserData } from '../../contexts/UserDataContext';
 import "./form.css"
 
 function Form_detail_stade() {
-    const { images, stade,maladie } = useUserData(); // Assurez-vous que images et stade sont correctement définis
+    const { images, path,maladie } = useUserData(); 
     console.log(images.length);
 
     const imagesPerPage = 52;
@@ -16,16 +16,15 @@ function Form_detail_stade() {
         setCurrentPage(newPage);
     };
 
-    // Divisez les images en groupes de quatre pour chaque page
     const startIdx = (currentPage - 1) * imagesPerPage;
     const endIdx = currentPage * imagesPerPage;
     const visibleImages = images.slice(startIdx, endIdx);
 
     return (
         <Container className='image-container'>
-            <Row>
+            <Row className='titre-stade-container'>
                 <Col>
-                    <h2 className='titre'>{maladie.nom} stage details</h2>
+                    <h2 className='titre-stade'>{maladie.nom} stage details</h2>
                 </Col>
             </Row>
             <Row className='img-row'>
@@ -33,25 +32,26 @@ function Form_detail_stade() {
                     <Col key={index} lg={3} sm={6} xs={12}>
                         <figure>
                             <img
-                                src={image.imagePath}
+                                src={`${path}/uploads/${image.imagePath}`}
                                 width={150}
                                 height={150}
                                 alt={image.title}
+                                className='img-stade'
                             />
                             <figcaption>{image.title}</figcaption>
                         </figure>
                     </Col>
                 ))}
             </Row>
-            <Row className='justify-content-center'>
+            <Row className='pagination-container'>
                 <Col>
                     <div className='pagination'>
                         {Array.from({ length: totalPages }, (_, index) => (
                             <button
                                 key={index}
                                 onClick={() => handlePageChange(index + 1)}
-                                className={currentPage === index + 1 ? 'active' : ''}
-                                id="btn-page"
+                                className={currentPage === index + 1 ? 'active-btn' : 'notActive'}
+                                
                             >
                                 {index + 1}
                             </button>

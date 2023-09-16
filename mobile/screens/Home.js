@@ -10,24 +10,24 @@ import { TextInput } from 'react-native-gesture-handler';
 const { width } = Dimensions.get('screen');
 
 const Home = () => {
-  const {rdvs} = useUserData()
+  const {consultations} = useUserData()
   const [searchValue, setSearchValue] = useState('');
 
-  const filteredRdvs = rdvs.filter((rdv) => {
+  const filteredConsultations = consultations.filter((consultation) => {
     return (
-      rdv.patient.nom.toLowerCase().includes(searchValue.toLowerCase()) ||
-      rdv.dateDebutRdv.toLowerCase().includes(searchValue.toLowerCase())||
-      rdv.patient.tel.toLowerCase().includes(searchValue.toLowerCase())
+      consultation.rdv.patient.nom.toLowerCase().includes(searchValue.toLowerCase()) ||
+      consultation.rdv.dateDebutRdv.toLowerCase().includes(searchValue.toLowerCase())||
+      consultation.rdv.patient.tel.toLowerCase().includes(searchValue.toLowerCase())
     );
   });
-  renderRdvs = () => {
+  const renderConsultations = () => {
     return (
       <Block flex center style={styles.home}>
       <View style={styles.header}>
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by name or appointment date"
+            placeholder="Search by name or Number"
             value={searchValue}
             onChangeText={(text) => setSearchValue(text)}
           />
@@ -40,12 +40,12 @@ const Home = () => {
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.Rdvs}>
+        contentContainerStyle={styles.consultations}>
         <Block flex>
-          {rdvs &&
-            filteredRdvs.map((rdv,index)=>(
+          {consultations &&
+            filteredConsultations.map((consult,index)=>(
               <Block key={index}>
-                <Card item={rdv} horizontal />
+                <Card item={consult} horizontal />
               </Block>
             ))}
         </Block>
@@ -56,7 +56,7 @@ const Home = () => {
 
     return (
       <Block flex center style={styles.home}>
-        {this.renderRdvs()}
+        {renderConsultations()}
       </Block>
     );
 }
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   home: {
     width: width,    
   },
-  Rdvs: {
+  consultations: {
     width: width - theme.SIZES.BASE * 2,
     paddingVertical: theme.SIZES.BASE,
   },

@@ -5,9 +5,10 @@ import { StyleSheet, Dimensions, Image, TouchableWithoutFeedback } from 'react-n
 import { Block, Text, theme } from 'galio-framework';
 import Images from "../constants/Images";
 import { argonTheme } from '../constants';
-import { fetchConsultationsRdv } from './fetchElement/fetchConsultation';
+import { fetchConsultation, fetchConsultationsRdv } from './fetchElement/fetchConsultation';
 import { fetchRdv } from './fetchElement/fetchRdvs';
 import { useUserData } from '../contexts/useUserData';
+import { fetchConsultationDiagnostic } from './fetchElement/fetchDiagnostics';
 
 
 
@@ -25,29 +26,29 @@ const Card = (props)=> {
       styles.shadow
     ];
 
-    const {userData, updateRdv, updateConsultations} = useUserData()
+    const {userData, updateConsultation, updateDiagnostics, path} = useUserData()
 
-    const fconsults = (rdv_id) =>{
-      console.log('hello')
-      fetchRdv(rdv_id,updateRdv);
-      fetchConsultationsRdv(rdv_id, updateConsultations)
-      navigation.navigate("consultations")
+    const fdiagnostics = (conult_id) =>{
+      // console.log('hello')
+      fetchConsultation(path,conult_id,updateConsultation);
+      fetchConsultationDiagnostic(path,conult_id, updateDiagnostics)
+      navigation.navigate("diagnostics")
     }
 
     return (
       <Block row={horizontal} card flex style={cardContainer}>
-        <TouchableWithoutFeedback onPress={() => fconsults(item._id)}>
+        <TouchableWithoutFeedback onPress={() => fdiagnostics(item._id)}>
           <Block flex style={imgContainer}>
           <Image source={Images.rdvImage} style={imageStyles} />
           </Block>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => fconsults(item._id)}>
+        <TouchableWithoutFeedback onPress={() => fdiagnostics(item._id)}>
           <Block flex space="between" style={styles.cardDescription}>
-            <Text size={14} style={styles.cardTitle}>Name : {item.patient.nom} {item.patient.prenom}</Text>
-            <Text size={14} style={styles.cardTitle}>Phone : {item.patient.tel}</Text>
-            <Text size={14} style={styles.cardTitle}>Date : {new Date(item.dateDebutRdv).toISOString().split('T')[0]}</Text>
+            <Text size={14} style={styles.cardTitle}>Name : {item.rdv.patient.nom} {item.rdv.patient.prenom}</Text>
+            <Text size={14} style={styles.cardTitle}>Phone : {item.rdv.patient.tel}</Text>
+            <Text size={14} style={styles.cardTitle}>Date : {new Date(item.rdv.dateDebutRdv).toISOString().split('T')[0]}</Text>
             <Text size={12} muted={!ctaColor} color={ctaColor || argonTheme.COLORS.ACTIVE} bold> Hour {
-                        `${new Date(item.dateDebutRdv).getHours()}:${String(new Date(item.dateDebutRdv).getMinutes()).padStart(2, '0')}`
+                        `${new Date(item.rdv.dateDebutRdv).getHours()}:${String(new Date(item.rdv.dateDebutRdv).getMinutes()).padStart(2, '0')}`
                       }</Text>
           </Block>
         </TouchableWithoutFeedback>

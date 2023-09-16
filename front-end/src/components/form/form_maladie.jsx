@@ -5,25 +5,36 @@ import { fetchMaladies } from '../fetchElement/fetchMaladies';
 import { useUserData } from '../../contexts/UserDataContext';
 import { useNavigate } from 'react-router-dom';
 import "./form.css";
+import { useEffect } from 'react';
 
-export default function Form_maladie({ open }) {
+export default function Form_maladie({ open, maladieToUpdate }) {
   const [maladie, setMaladie] = useState('');
   const [nombreStades, setNombreStades] = useState(0);
   const [stades, setStades] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(open);
   const [bouton, setBouton] = useState("save")
-  const { updateMaladies } = useUserData()
+  const { updateMaladies, path } = useUserData()
   const [successMessage, setSuccessMessage] = useState("");
   const [ok, setOk] = useState(true)
-  
+  const [fullName, setFullName] = useState("")
 
+
+
+  useEffect(() => {
+    if (maladieToUpdate) {
+      setMaladie(maladieToUpdate.nom);
+      setFullName(maladieToUpdate.fullName);
+      // setStades()
+      setBouton("Update")
+    }
+  }, [maladieToUpdate])
 
   const handleNombreStadesChange = (event) => {
     const count = parseInt(event.target.value);
     setNombreStades(count);
 
     // Initialize stades array with unique objects for each stade
-    const newStades = Array.from({ length: count }, () => ({ nom: '', images: [], description: '' }));
+    const newStades = Array.from({ length: count }, () => ({ fullName: '', nom: '', images: [], description: '' }));
     setStades(newStades);
   };
 
@@ -49,13 +60,22 @@ export default function Form_maladie({ open }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setSuccessMessage("Wait please, disease is recording ..........")
-    try {
-      await createMaladie();
-      await fetchMaladies(updateMaladies);
+    setOk(false)
+    if (maladieToUpdate) {
+      setSuccessMessage("Wait please, disease is updating ..........");
+      await updateMaladie();
+      await fetchMaladies(path, updateMaladies);
       setModalIsOpen(false)
-    } catch (error) {
-      console.log("Erreur lors de la soumission du formulaire :", error);
+    }
+    else {
+      setSuccessMessage("Wait please, disease is recording ..........")
+      try {
+        await createMaladie();
+        await fetchMaladies(path, updateMaladies);
+        setModalIsOpen(false)
+      } catch (error) {
+        console.log("Erreur lors de la soumission du formulaire :", error);
+      }
     }
   };
 
@@ -65,7 +85,9 @@ export default function Form_maladie({ open }) {
     const formData = new FormData();
     formData.append("image", image);
     try {
-      const response2 = await axios.post(`http://192.168.11.104:5000/api/stade/image/create/${stade_id}`,
+      const token = localStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response2 = await axios.post(`${path}/api/stade/image/create/${stade_id}`,
         formData
       )
       if (response2.status === 200) {
@@ -80,7 +102,9 @@ export default function Form_maladie({ open }) {
 
   const createStade = async (maladie_id, stade) => {
     try {
-      const response = await axios.post(`http://192.168.11.104:5000/api/stade/create/${maladie_id}`, {
+      const token = localStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response = await axios.post(`${path}/api/stade/create/${maladie_id}`, {
         stade: stade.nom,
         description: stade.description
       })
@@ -102,13 +126,42 @@ export default function Form_maladie({ open }) {
 
   const createMaladie = async () => {
     try {
-      const response = await axios.post('http://192.168.11.104:5000/api/maladie/create', {
-        nom: maladie
+      const token = localStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response = await axios.post(`${path}/api/maladie/create`, {
+        nom: maladie,
+        fullName
       })
       if (response.status == 201) {
         // for (const stade of stades) {
         //   createStade(response.data._id, stade)
         // }
+        const stadesPromises = stades.map(stade => createStade(response.data._id, stade));
+
+        // Attendre que toutes les stades soient créées
+        await Promise.all(stadesPromises);
+
+        // Créer toutes les images en parallèle
+        const imagesPromises = stades.flatMap(stade => stade.images.map(image => createImage(response.data._id, image)));
+
+        // Attendre que toutes les images soient créées
+        await Promise.all(imagesPromises);
+      }
+    }
+    catch (err) {
+      console.log("Echec de l'enregistrement de la maladie")
+    }
+  }
+
+  const updateMaladie = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response = await axios.put(`${path}/api/maladie/update/${maladieToUpdate._id}`, {
+        nom: maladie,
+        fullName
+      })
+      if (response.status == 201) {
         const stadesPromises = stades.map(stade => createStade(response.data._id, stade));
 
         // Attendre que toutes les stades soient créées
@@ -136,8 +189,16 @@ export default function Form_maladie({ open }) {
           <Modal.Title>DISEASE FORM</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        {successMessage && <p className="success-message">{successMessage}</p>}
-          <div className='form-group mb-2' style={{display:'flex', justifyContent:'space-between'}}>
+          {successMessage && <p className="success-message">{successMessage}</p>}
+          <div className='form-group mb-2' style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <label>Disease FullName</label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </div>
+          <div className='form-group mb-2' style={{ display: 'flex', justifyContent: 'space-between' }}>
             <label>Disease Name</label>
             <input
               type="text"
@@ -145,8 +206,8 @@ export default function Form_maladie({ open }) {
               onChange={(e) => setMaladie(e.target.value)}
             />
           </div>
-          <div className='form-group mb-2' style={{display:'flex', justifyContent:'space-between'}}>
-            <label>Number of Level</label>
+          <div className='form-group mb-2' style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <label>{maladieToUpdate ? 'Add new Levels' : 'Number of Level'}</label>
             <input
               type="number"
               value={nombreStades}
@@ -155,7 +216,7 @@ export default function Form_maladie({ open }) {
           </div>
           {stades.map((stade, index) => (
             <div key={index} className='container'>
-              <div className='form-group mb-2' style={{display:'flex', justifyContent:'space-between'}}>
+              <div className='form-group mb-2' style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <label>{`Level ${index + 1} `}</label>
                 <input
                   type="text"
@@ -163,7 +224,7 @@ export default function Form_maladie({ open }) {
                   onChange={(e) => handleStadeChange(index, 'nom', e.target.value)}
                 />
               </div>
-              <div className='form-group mb-2' style={{display:'flex', justifyContent:'space-between'}}>
+              <div className='form-group mb-2' style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <label>{`Description ${index + 1} `}</label>
                 <input
                   type="text"
@@ -190,7 +251,7 @@ export default function Form_maladie({ open }) {
             </div>
           ))}
         </Modal.Body>
-        {ok&&<Modal.Footer>
+        {ok && <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
             Close
           </Button>

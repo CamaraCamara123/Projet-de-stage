@@ -5,12 +5,14 @@ import { calculateRange, sliceData } from '../../utils/table-pagination';
 import '../styles.css';
 import { useUserData } from '../../contexts/UserDataContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrashAlt, faEye, faAnglesUp, faAnglesDown, faThLarge } from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faThLarge } from '@fortawesome/free-solid-svg-icons';
 import { fetchStade } from '../../components/fetchElement/fetchStades';
 import Form_delete_stade from '../../components/form/form_delete_stade';
 import { fetchStadeImages } from '../../components/fetchElement/fetchImages';
 import { Navigate } from 'react-router-dom';
 import Transition from '../../constants/transition';
+import { Table } from 'react-bootstrap';
+import './style.css'
 
 function Stades() {
   const { stades } = useUserData();
@@ -18,12 +20,9 @@ function Stades() {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState([]);
   const [filteredStades, setFilteredStades] = useState([]);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalIsOpen2, setModalIsOpen2] = useState(false);
   const [modalIsOpen3, setModalIsOpen3] = useState(false);
-  const [modalIsOpen4, setModalIsOpen4] = useState(false);
-  const [modalIsOpen5, setModalIsOpen5] = useState(false);
-  const { stade, updateStade, maladie, updateImages } = useUserData();
+  const { stade, updateStade, path, updateImages } = useUserData();
 
 
   useEffect(() => {
@@ -54,15 +53,15 @@ function Stades() {
 
 
   const fdetail = (stade_id) => {
-    fetchStadeImages(stade_id, updateImages)
-    fetchStade(stade_id, updateStade);
+    fetchStadeImages(path,stade_id, updateImages)
+    fetchStade(path,stade_id, updateStade);
     modalIsOpen2 ? setModalIsOpen2(false) : setModalIsOpen2(true);
-    if (stade && stade.stade_id == stade_id) {
-    }
+    // if (stade && stade.stade_id == stade_id) {
+    // }
   }
 
   const fdelete = (stade_id) => {
-    fetchStade(stade_id, updateStade);
+    fetchStade(path,stade_id, updateStade);
     modalIsOpen3 ? setModalIsOpen3(false) : setModalIsOpen3(true);
   }
 
@@ -84,11 +83,12 @@ function Stades() {
             </div>
           </div>
 
-          <table>
+          <Table striped bordered responsive>
             <thead>
               <th>LEVEL</th>
               <th>DESCRIPTION</th>
-              <th>ACTIONS</th>
+              <th>DETAIL</th>
+              <th>DELETE</th>
             </thead>
 
             {filteredStades.length !== 0 ? (
@@ -102,13 +102,15 @@ function Stades() {
                       {stade.description}
                     </td>
                     <td>
-                      <span>
-                        <button className='btn btn-dark' title='detail' onClick={() => fdetail(stade._id)}>
+                    <span>
+                        <button className='elt-btn btn btn-dark' title='detail' onClick={() => fdetail(stade._id)}>
                           <FontAwesomeIcon icon={faThLarge} />
                         </button>
                       </span>
+                    </td>
+                    <td>
                       <span>
-                        <button className='btn btn-danger display-flex' title='suppression' onClick={() => fdelete(stade._id)}>
+                        <button className='elt-btn btn btn-danger display-flex' title='delete' onClick={() => fdelete(stade._id)}>
                           <FontAwesomeIcon icon={faTrashAlt} />
                         </button>
                       </span>
@@ -117,7 +119,7 @@ function Stades() {
                 ))}
               </tbody>
             ) : null}
-          </table>
+          </Table>
 
           {filteredStades.length !== 0 ? (
             <div className='dashboard-content-footer'>

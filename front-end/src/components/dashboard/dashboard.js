@@ -9,14 +9,15 @@ import sidebar_menu_medecin from '../../constants/siderBar-menu-medecin';
 import axios from 'axios';
 import fetchPatients from '../fetchElement/fetchPatients';
 import fetchSecretaires from '../fetchElement/fetchSecretaires';
-import { fetchRdvs, fetchPatientRdvs, fetchPatientMedecinTodayRdvs } from '../fetchElement/fetchRdvs';
+import { fetchRdvs, fetchPatientRdvs, fetchMedecinTodayRdvs, fetchDayRdvs } from '../fetchElement/fetchRdvs';
 import sidebar_menu_secretaire from '../../constants/sidebar_menu_secretaire';
 import { fetchMedecinPatient, fetchMedecins } from '../fetchElement/fetchMedecins';
-import { fetchConsultations } from '../fetchElement/fetchConsultations';
+import { fetchConsultations, fetchMedecinDayConsultations } from '../fetchElement/fetchConsultations';
 import { fetchMaladies } from '../fetchElement/fetchMaladies';
 import '../../pages/styles.css'
 import sidebar_menu_patient from '../../constants/siderbar_menu_patient';
 import Transition from '../../constants/transition';
+
 
 
 function Dashboard() {
@@ -30,26 +31,14 @@ function Dashboard() {
 
   //tableau de bord utilisateur
   const [sidermenu, setSiderMenu] = useState([]);
-  const {updateAgenda, updatedDoctor_agenda} = useUserData();
-  const colors = ['#FF5733', '#FFC300', '#36A2EB', '#4CAF50', '#E91E63'];
-
+  const {updateAgenda, path} = useUserData();
   const agenda = (medecins)=>{
-    let doctorIdCounter = 0;
-    let rdvIdCounter = 0;
-
-    const updatedDoctors = [];
-    const updatedMedecinRdvs = [];
+    const updatedMedecinRdv = {};
 
     for (const medecin of medecins) {
-      const randomIndex = Math.floor(Math.random() * colors.length);
-      const randomColor = colors[randomIndex];
-      const newDoctor = {
-        Id: doctorIdCounter,
-        Text: `${medecin.nom} ${medecin.prenom}`,
-        _id: medecin._id,
-        Color: randomColor
-      };
-      updatedDoctors.push(newDoctor);
+      let rdvIdCounter = 0;
+      let tel = medecin.tel;
+      const rdvsForMedecin = [];
 
       for (const rdv_medecin of medecin.rdv) {
         const newRdv = {
@@ -57,21 +46,17 @@ function Dashboard() {
           Subject: rdv_medecin.patient.nom,
           StartTime: rdv_medecin.dateDebutRdv,
           EndTime: rdv_medecin.dateFinRdv,
-          DoctorId: [doctorIdCounter],
+          Color: '#FF5733'
         };
-        updatedMedecinRdvs.push(newRdv);
+        rdvsForMedecin.push(newRdv);
 
         rdvIdCounter++;
       }
 
-      doctorIdCounter++;
+      updatedMedecinRdv[tel] = rdvsForMedecin;
     }
 
-
-    updatedDoctor_agenda(updatedDoctors);
-    updateAgenda(updatedMedecinRdvs);
-    console.log("agenda : ", updatedDoctors)
-
+    updateAgenda(updatedMedecinRdv);
   }
 
   useEffect(() => {
@@ -80,37 +65,38 @@ function Dashboard() {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       try {
-        const response = await axios.get('http://192.168.11.104:5000/api/users/current');
+        const response = await axios.get(`${path}/api/users/current`);
         updateUserData(response.data);
         localStorage.setItem('user', response.data)
         if (response.data.role.includes('admin')) {
           setSiderMenu(sidebar_menu);
-          fetchPatients(updatePatients);
-          fetchMedecins(updateMedecins);
-          fetchSecretaires(updateSecretaires);
-          fetchRdvs(updateRdvs);
-          fetchConsultations(updateConsultations);
-          fetchMaladies(updateMaladies);
+          fetchPatients(path,updatePatients);
+          fetchMedecins(path,updateMedecins);
+          fetchSecretaires(path,updateSecretaires);
+          fetchRdvs(path,updateRdvs);
+          fetchConsultations(path,updateConsultations);
+          fetchMaladies(path,updateMaladies);
           updateUserData(response.data);
         } else if (response.data.role.includes('medecin') && !response.data.role.includes('admin')) {
           setSiderMenu(sidebar_menu_medecin);
-          fetchPatientMedecinTodayRdvs(response.data._id, updateRdvs);
-          fetchSecretaires(updateSecretaires);
+          fetchMedecinTodayRdvs(path,response.data._id, updateRdvs);
+          fetchSecretaires(path,updateSecretaires);
           agenda([response.data]);
           updateMedecin(response.data);
-          fetchMaladies(updateMaladies);
+          fetchMaladies(path,updateMaladies);
           updateUserData(response.data);
-          fetchMedecinPatient(response.data._id, updatePatients)
+          fetchMedecinPatient(path,response.data._id, updatePatients)
+          fetchMedecinDayConsultations(path,response.data._id,updateConsultations)
         } else if (response.data.role.includes('patient') && !response.data.role.includes('admin')) {
           setSiderMenu(sidebar_menu_patient);
-          fetchPatientRdvs(response.data._id, updateRdvs);
+          fetchPatientRdvs(path,response.data._id, updateRdvs);
           updatePatient(response.data)
           updateUserData(response.data);
         } else if (response.data.role.includes('secretaire') && !response.data.role.includes('admin')) {
           setSiderMenu(sidebar_menu_secretaire);
-          fetchPatients(updatePatients)
-          fetchMedecins(updateMedecins);
-          fetchRdvs(updateRdvs);
+          fetchPatients(path,updatePatients)
+          fetchMedecins(path,updateMedecins);
+          fetchDayRdvs(path,updateRdvs);
           updateSecretaire(response.data)
           updateUserData(response.data);
 

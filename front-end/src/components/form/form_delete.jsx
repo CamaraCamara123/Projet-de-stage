@@ -12,27 +12,26 @@ function Form_confirm_delete({ open, userToDelete }) {
   const [modalIsOpen, setModalIsOpen] = useState(open);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const {updatePatients,UpdateMedecins,updateSecretaires} = useUserData();
+  const { updatePatients, UpdateMedecins, updateSecretaires, path } = useUserData();
 
   const onDelete = () => {
     setModalIsOpen(false);
-    return <Navigate to='/dashboard' />
   }
   const handleDelete = async () => {
-    console.log(userToDelete.username)
-    console.log("hello")
     if (
       userToDelete.role.includes("patient") &&
       userToDelete.role.length === 1
     ) {
 
       try {
+        const token = localStorage.getItem('token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         const response = await axios.delete(
-          `http://192.168.11.104:5000/api/users/patient/delete/${userToDelete._id}`
+          `${path}/api/users/patient/delete/${userToDelete._id}`
         );
 
         if (response.status === 200) {
-          fetchPatients(updatePatients)
+          fetchPatients(path, updatePatients)
           setSuccessMessage("user deleted successfully!");
           setErrorMessage("");
           onDelete()
@@ -48,12 +47,14 @@ function Form_confirm_delete({ open, userToDelete }) {
       userToDelete.role.length === 1
     ) {
       try {
+        const token = localStorage.getItem('token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         const response = await axios.delete(
-          `http://192.168.11.104:5000/api/users/dermatologue/delete/${userToDelete._id}`
+          `${path}/api/users/dermatologue/delete/${userToDelete._id}`
         );
 
         if (response.status === 200) {
-          fetchMedecins(UpdateMedecins)
+          fetchMedecins(path, UpdateMedecins)
           setSuccessMessage("Dermatologue deleted successfully!");
           setErrorMessage("");
           onDelete();
@@ -68,12 +69,14 @@ function Form_confirm_delete({ open, userToDelete }) {
       userToDelete.role.length === 1
     ) {
       try {
+        const token = localStorage.getItem('token');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         const response = await axios.delete(
-          `http://192.168.11.104:5000/api/users/secretaire/delete/${userToDelete._id}`
+          `${path}/api/users/secretaire/delete/${userToDelete._id}`
         );
 
         if (response.status === 200) {
-          fetchSecretaires(updateSecretaires)
+          fetchSecretaires(path, updateSecretaires)
           setSuccessMessage("Secretaire deleted successfully!");
           setErrorMessage("");
           onDelete();

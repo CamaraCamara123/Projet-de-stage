@@ -11,7 +11,7 @@ function Form__delete_consultation({ open, consultationToDelete }) {
   const [modalIsOpen, setModalIsOpen] = useState(open);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const {updateConsultations,medecin,patient} = useUserData()
+  const { updateConsultations, path } = useUserData()
 
 
   const closeModal = () => {
@@ -20,25 +20,27 @@ function Form__delete_consultation({ open, consultationToDelete }) {
 
   const onDelete = () => {
     setModalIsOpen(false);
-    fetchConsultationsRdv(consultationToDelete.rdv._id,updateConsultations)
+    fetchConsultationsRdv(path, consultationToDelete.rdv._id, updateConsultations)
   }
   const handleDelete = async () => {
-      try {
-        const response = await axios.delete(
-          `http://192.168.11.104:5000/api/consultation/delete/${consultationToDelete._id}`
-        );
+    try {
+      const token = localStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response = await axios.delete(
+        `${path}/api/consultation/delete/${consultationToDelete._id}`
+      );
 
-        if (response.status === 200) {
-            fetchConsultationsRdv(consultationToDelete.rdv._id,updateConsultations)
-          setSuccessMessage("consultation deleted successfully!");
-          setErrorMessage("");
-          onDelete();
-        }
-      } catch (error) {
-        console.error("Error deleting consultation", error);
-        setErrorMessage("Error deleting rendez-vous. Please try again.");
-        setSuccessMessage("");
+      if (response.status === 200) {
+        fetchConsultationsRdv(path, consultationToDelete.rdv._id, updateConsultations)
+        setSuccessMessage("consultation deleted successfully!");
+        setErrorMessage("");
+        onDelete();
       }
+    } catch (error) {
+      console.error("Error deleting consultation", error);
+      setErrorMessage("Error deleting rendez-vous. Please try again.");
+      setSuccessMessage("");
+    }
   };
 
   const handleCloseModal = () => {

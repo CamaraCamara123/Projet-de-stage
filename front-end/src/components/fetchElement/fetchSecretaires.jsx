@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const fetchSecretaires = async (updateSecretaires) => {
+const fetchSecretaires = async (path,updateSecretaires) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get('http://192.168.11.104:5000/api/users/secretaires', {
+      const response = await axios.get(`${path}/api/users/secretaires`, {
         headers: {
           'Content-Type': 'application/json'
         }

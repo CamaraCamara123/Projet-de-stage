@@ -20,7 +20,7 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
     const [genre, setGenre] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const {updateSecretaires }= useUserData()
+    const {updateSecretaires, path }= useUserData()
     const [msgError, setMsgError] = useState("")
     const [bouton, setBouton] = useState("save")
 
@@ -50,7 +50,7 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
             formData.append("image", photo);
 
             const response2 = await axios.put(
-                `http://192.168.11.104:5000/api/users/user/upload-image/${username}`,
+                `${path}/api/users/user/upload-image/${username}`,
                 formData
             );
 
@@ -79,9 +79,8 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
                 try {
-                    console.log(tel, genre);
                     const response = await axios.put(
-                        `http://192.168.11.104:5000/api/users/secretaire/update/${secretaireToUpdate._id}`,
+                        `${path}/api/users/secretaire/update/${secretaireToUpdate._id}`,
                         {
                             username,
                             nom,
@@ -93,11 +92,9 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
                     );
 
                     if (response.status === 200) {
-                        const patient = response.data;
-                        console.log("update Secretaire done :", patient);
                         setSuccessMessage("Updated successful!");
                         setErrorMessage("");
-                        fetchSecretaires(updateSecretaires);
+                        fetchSecretaires(path,updateSecretaires);
                         if (photo) {
                             handlePhoto(photo, username);
                         }
@@ -113,7 +110,7 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
             } else {
                 try {
                     const response = await axios.post(
-                        "http://192.168.11.104:5000/api/users/secretaire/create",
+                        `${path}/api/users/secretaire/create`,
                         {
                             username,
                             password,
@@ -127,11 +124,9 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
                     );
 
                     if (response.status === 201) {
-                        const Secretaire = response.data;
-                        console.log("Nouveau Secretaire enregistré :", Secretaire);
                         setSuccessMessage("Registration successful!");
                         setErrorMessage("");
-                        fetchSecretaires(updateSecretaires);
+                        fetchSecretaires(path,updateSecretaires);
                         if (photo) {
                             handlePhoto(photo, username);
                         }
@@ -186,10 +181,6 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
         }
     };
 
-    const closeModal = () => {
-        setModalIsOpen(false);
-    };
-
     const handleCloseModal = () => {
         setModalIsOpen(false);
     }
@@ -198,7 +189,7 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
         <Modal show={modalIsOpen} onHide={handleCloseModal}>
             <form onSubmit={handleSubmit}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Formulaire sécrétaire</Modal.Title>
+                    <Modal.Title>Secretory form</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {successMessage && <p className="success-message">{successMessage}</p>}

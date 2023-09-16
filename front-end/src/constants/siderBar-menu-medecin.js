@@ -49,12 +49,18 @@ const sidebar_menu_medecin = [
     },
     {
         id: 5,
+        icon: PatientIcon,
+        path: '/dashboard/visits',
+        title: 'Today visits',
+    },
+    {
+        id: 6,
         icon: AgendaIcon,
         path: '/dashboard/agenda',
         title: 'My timeslots',
     },
     {
-        id: 6,
+        id: 7,
         icon: UserIcon,
         path: '/dashboard/account',
         title: 'My account',

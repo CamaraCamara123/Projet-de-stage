@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Modal, Button } from 'react-bootstrap';
 import axios from "axios"; // Import Axios
 import "./form.css";
-import { Link, Navigate } from "react-router-dom";
 import { fetchMedecinRdvs, fetchPatientRdvs, fetchRdvs } from "../fetchElement/fetchRdvs";
 import { useUserData } from "../../contexts/UserDataContext";
 
@@ -10,42 +9,39 @@ function Form__delete_rdv({ open, rdvToDelete }) {
   const [modalIsOpen, setModalIsOpen] = useState(open);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const {updateRdvs,medecin,patient} = useUserData()
+  const { updateRdvs, medecin, patient, path } = useUserData()
 
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
 
   const onDelete = () => {
     setModalIsOpen(false);
-    return <Navigate to='/dashboard' />
   }
   const handleDelete = async () => {
-      try {
-        const response = await axios.delete(
-          `http://192.168.11.104:5000/api/rendez_vous/${rdvToDelete._id}`
-        );
+    try {
+      const token = localStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const response = await axios.delete(
+        `${path}/api/rendez_vous/${rdvToDelete._id}`
+      );
 
-        if (response.status === 200) {
-          if(patient){
-            fetchPatientRdvs(updateRdvs)
-          }
-          else if(medecin){
-            fetchMedecinRdvs(updateRdvs)
-          }
-          else{
-            fetchRdvs(updateRdvs)
-          }
-          setSuccessMessage("rendez-vous deleted successfully!");
-          setErrorMessage("");
-          onDelete();
+      if (response.status === 200) {
+        if (patient) {
+          fetchPatientRdvs(path, patient._id, updateRdvs)
         }
-      } catch (error) {
-        console.error("Error deleting rendez-vous", error);
-        setErrorMessage("Error deleting rendez-vous. Please try again.");
-        setSuccessMessage("");
+        else if (medecin) {
+          fetchMedecinRdvs(path, patient._id, updateRdvs)
+        }
+        else {
+          fetchRdvs(path, updateRdvs)
+        }
+        setSuccessMessage("rendez-vous deleted successfully!");
+        setErrorMessage("");
+        onDelete();
       }
+    } catch (error) {
+      console.error("Error deleting rendez-vous", error);
+      setErrorMessage("Error deleting rendez-vous. Please try again.");
+      setSuccessMessage("");
+    }
   };
 
   const handleCloseModal = () => {

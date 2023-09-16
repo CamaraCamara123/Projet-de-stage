@@ -1,10 +1,11 @@
 import axios from "axios";
 
-export const fetchRdvs = async (updateRdvs) => {
+
+export const fetchRdvs = async (path,updateRdvs) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get('http://192.168.11.104:5000/api/rendez_vous', {
+      const response = await axios.get(`${path}/api/rendez_vous`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -16,11 +17,12 @@ export const fetchRdvs = async (updateRdvs) => {
     }
   };
 
-export const fetchMedecinRdvs = async (user_id,updateRdvs) => {
+
+export const fetchMedecinRdvs = async (path,user_id,updateRdvs) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get(`http://192.168.11.104:5000/api/rendez_vous/dermatologue/${user_id}`, {
+      const response = await axios.get(`${path}/api/rendez_vous/dermatologue/${user_id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -32,11 +34,11 @@ export const fetchMedecinRdvs = async (user_id,updateRdvs) => {
     }
   };
 
-  export const fetchPatientRdvs = async (user_id,updateRdvs) => {
+  export const fetchPatientRdvs = async (path,user_id,updateRdvs) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get(`http://192.168.11.104:5000/api/rendez_vous/patient/${user_id}`, {
+      const response = await axios.get(`${path}/api/rendez_vous/patient/${user_id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -48,11 +50,11 @@ export const fetchMedecinRdvs = async (user_id,updateRdvs) => {
     }
   };
 
-  export const fetchPatientMedecinRdvs = async (medecin_id, patient_id,updateRdvs) => {
+  export const fetchMedecinFuturRdvs = async (path,medecin_id,updateRdvs) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get(`http://192.168.11.104:5000/api/rdv/medecin/patient/${medecin_id}/${patient_id}`, {
+      const response = await axios.get(`${path}/api/rdv/dermatologue/futur/${medecin_id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -64,11 +66,11 @@ export const fetchMedecinRdvs = async (user_id,updateRdvs) => {
     }
   };
 
-  export const fetchPatientMedecinTodayRdvs = async (medecin_id,updateRdvs) => {
+  export const fetchMedecinTodayRdvs = async (path,medecin_id,updateRdvs) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get(`http://192.168.11.104:5000/api/rendez_vous/dermatologue/today/${medecin_id}`, {
+      const response = await axios.get(`${path}/api/rendez-vous/dermatologue/today/${medecin_id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -80,11 +82,11 @@ export const fetchMedecinRdvs = async (user_id,updateRdvs) => {
     }
   };
 
-  export const fetchRdv = async (rdv_id,updateRdv) => {
+  export const fetchRdv = async (path,rdv_id,updateRdv) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-      const response = await axios.get(`http://192.168.11.104:5000/api/rendez_vous/${rdv_id}`, {
+      const response = await axios.get(`${path}/api/rendez_vous/${rdv_id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -93,5 +95,22 @@ export const fetchMedecinRdvs = async (user_id,updateRdvs) => {
       console.log(response.data)
     } catch (error) {
       console.error('Erreur lors de la récupération des données du rdv :', error);
+    }
+  };
+
+  // tous les rdvs du jour
+  export const fetchDayRdvs = async (path,updateRdvs) => {
+    const token = localStorage.getItem('token');
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    try {
+      const response = await axios.get(`${path}/api/rendez_vous/today`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      updateRdvs(response.data);
+      console.log(response.data)
+    } catch (error) {
+      console.error('Erreur lors de la récupération des données rendez_vous :', error);
     }
   };

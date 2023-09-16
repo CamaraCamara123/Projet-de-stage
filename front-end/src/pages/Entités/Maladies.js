@@ -17,6 +17,8 @@ import { fetchMaladie, fetchMaladies } from '../../components/fetchElement/fetch
 import Form_delete_maladie from '../../components/form/form_delete_maladie';
 import userEvent from '@testing-library/user-event';
 import Transition from '../../constants/transition';
+import './style.css'
+import { Table } from 'react-bootstrap';
 
 function Maladies() {
   const { maladies, userData } = useUserData();
@@ -28,8 +30,7 @@ function Maladies() {
   const [modalIsOpen2, setModalIsOpen2] = useState(false);
   const [modalIsOpen3, setModalIsOpen3] = useState(false);
   const [modalIsOpen4, setModalIsOpen4] = useState(false);
-  const { maladie, updateMaladie, updateStades } = useUserData()
-  const { updateUserIdData } = useUserData();
+  const { maladie, updateMaladie, updateStades, path } = useUserData()
 
   const openModal = () => {
     modalIsOpen ? setModalIsOpen(false) : setModalIsOpen(true);
@@ -47,8 +48,8 @@ function Maladies() {
       let search_results = maladies.filter(
         (maladie) =>
           maladie.nom.toLowerCase().includes(search.toLowerCase())
-        // ||
-        // maladie.code.toLowerCase().includes(search.toLowerCase())
+        ||
+        maladie.fullName.toLowerCase().includes(search.toLowerCase())
       );
       setfilteredMaladies(search_results);
     } else {
@@ -64,20 +65,18 @@ function Maladies() {
 
 
   const fupdate = (maladie_id) => {
-    fetchMaladie(maladie_id, updateMaladie);
+    fetchMaladie(path,maladie_id, updateMaladie);
     modalIsOpen2 ? setModalIsOpen2(false) : setModalIsOpen2(true);
   }
 
   const fdelete = (maladie_id) => {
-    fetchMaladie(maladie_id, updateMaladie);
+    fetchMaladie(path,maladie_id, updateMaladie);
     modalIsOpen3 ? setModalIsOpen3(false) : setModalIsOpen3(true);
   }
 
   const fstades = (maladie_id) => {
-    console.log(maladie_id)
-    fetchMaladie(maladie_id, updateMaladie);
-    fetchStadeMaladie(maladie_id, updateStades)
-    console.log(maladie)
+    fetchMaladie(path,maladie_id, updateMaladie);
+    fetchStadeMaladie(path,maladie_id, updateStades)
     modalIsOpen4 ? setModalIsOpen4(false) : setModalIsOpen4(true);
   }
 
@@ -121,8 +120,9 @@ function Maladies() {
             </div>
           </div>
 
-          <table>
+          <Table striped bordered responsive>
             <thead>
+              <th>FULL NAME</th>
               <th>NAME</th>
               <th>LEVELS</th>
               <th>UPDATE</th>
@@ -134,11 +134,14 @@ function Maladies() {
                 {filteredmaladies.map((maladie, index) => (
                   <tr key={index}>
                     <td>
+                      <span>{maladie.fullName}</span>
+                    </td>
+                    <td>
                       <span>{maladie.nom}</span>
                     </td>
                     <td>
                       <span>
-                        <button className='btn btn-primary' onClick={() => {
+                        <button className='elt-btn btn btn-primary' onClick={() => {
                           setModalIsOpen(false)
                           setModalIsOpen4(false)
                           setModalIsOpen2(false)
@@ -151,7 +154,7 @@ function Maladies() {
                     </td>
                     <td>
                       <span>
-                        <button className='btn btn-success' onClick={() => {
+                        <button className='elt-btn btn btn-success' onClick={() => {
                           setModalIsOpen(false)
                           setModalIsOpen4(false)
                           setModalIsOpen2(false)
@@ -164,7 +167,7 @@ function Maladies() {
                     </td>
                     <td>
                       <span>
-                        <button className='btn btn-danger display-flex' onClick={() => {
+                        <button className='elt-btn btn btn-danger display-flex' onClick={() => {
                           setModalIsOpen(false)
                           setModalIsOpen4(false)
                           setModalIsOpen2(false)
@@ -179,7 +182,7 @@ function Maladies() {
                 ))}
               </tbody>
             ) : null}
-          </table>
+          </Table>
 
           {filteredmaladies.length !== 0 ? (
             <div className='dashboard-content-footer'>

@@ -1,7 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import './styles.css'
-import { Button } from 'react-bootstrap';
 import { useUserData } from '../contexts/UserDataContext';
 import Transition from '../constants/transition';
 

@@ -50,7 +50,6 @@ class Patient(User):
 
 class Secretaire(User):
     codeEmp = StringField(required=True)
-    rdv = ListField(ReferenceField("Rendez_vous"))
 
 
 class Dermatologue(User):
@@ -62,28 +61,35 @@ class Rendez_vous(Document):
     _id = ObjectIdField(primary_key=True, default=lambda: ObjectId())
     dateDebutRdv = DateTimeField()
     dateFinRdv = DateTimeField()
-    statut = BooleanField(default=True)
+    statut = BooleanField(default=False)
     medecin = ReferenceField("Dermatologue")
     patient = ReferenceField("Patient")
-    consultations = ListField(ReferenceField("Consultation"))
+    consultation = ReferenceField("Consultation")
 
 
 class Consultation(Document):
     _id = ObjectIdField(primary_key=True, default=lambda: ObjectId())
     dateConsult = DateTimeField(default=lambda:datetime.now())
+    diagnostics = ListField(ReferenceField("Diagnostic"))
+    rdv = ReferenceField("Rendez_vous")
+
+class Diagnostic(Document):
+    _id = ObjectIdField(primary_key=True, default=lambda: ObjectId())
+    dateDiagnostic = DateTimeField(default=lambda:datetime.now())
     descripSymptome = ListField(StringField(required=False))
     imageName = StringField(required=False)
     imagePath = StringField(required=False)
     description = StringField(required=False)
     prescription = ListField(StringField(required=False))
+    consultation = ReferenceField("Consultation")
     maladie = ReferenceField("Maladie")
     probability = FloatField(required=False)
     maladies = ListField(ReferenceField("Maladie"))
     probabilities= ListField(FloatField())
-    rdv = ReferenceField("Rendez_vous")
 
 class Maladie(Document):
     _id = ObjectIdField(primary_key=True, default=lambda: ObjectId())
+    fullName = StringField(required=True)
     nom = StringField(required=True)
     stade = ListField(ReferenceField("Stade"))
 
@@ -101,3 +107,7 @@ class ImageStade(Document):
     imagePath = StringField(required=True)
     title = StringField(required=True)
     stade = ReferenceField("Stade")
+
+class Symptoms(Document):
+    _id = ObjectIdField(primary_key=True, default=lambda: ObjectId())
+    nom = StringField(required=True)

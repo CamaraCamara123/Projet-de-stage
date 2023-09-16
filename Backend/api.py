@@ -30,6 +30,7 @@ from tensorflow.keras.models import load_model
 from PIL import Image
 import tensorflow as tf
 import efficientnet.keras as efn
+from flask import send_from_directory
 
 
 def convert_objet_to_dict(objet, depth=1, max_depth=3):
@@ -110,9 +111,10 @@ app = Flask(__name__)
 
 CORS(app)  # Active les en-têtes CORS pour toutes les routes
 app.config["SECRET_KEY"] = secrets.token_hex(16)
-app.config[
-    "UPLOAD_FOLDER"
-] = os.path.dirname(_file_)
+# app.config[
+#     "UPLOAD_FOLDER"
+# ] = "C:\\Users\\Lenovo\\OneDrive\Bureau\\Stage\\Projet de stage\\front-end\\public\\images\\"
+app.config["UPLOAD_FOLDER"] = os.path.dirname(__file__)
 app.config["MONGODB_SETTINGS"] = {"db": "donnees", "host": "localhost", "port": 27017}
 connect(host="mongodb://localhost:27017/donnees")
 
@@ -136,6 +138,11 @@ def authenticate(username, password):
 @login_manager.user_loader
 def load_user(user_id):
     return User.get_user_by_id(user_id)
+
+
+@app.route("/uploads/<path:filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
 ############################################# Admin ###############################################################
@@ -171,7 +178,7 @@ def create_admin():
 
     admin = User(
         username=username,
-        password=hashed_password,  
+        password=hashed_password,
         confirmPassword=hashed_password,
         nom=nom,
         prenom=prenom,
@@ -366,13 +373,15 @@ def upload_patient_image(username):
 
     if image and allowed_file(image.filename):
         filename = secure_filename(image.filename)
-        profile_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images','profil', username)
+        profile_folder = os.path.join(
+            app.config["UPLOAD_FOLDER"], "uploads", "images", "profil", username
+        )
         os.makedirs(profile_folder, exist_ok=True)
         image_path = os.path.join(profile_folder, filename)
         image.save(image_path)
 
         user.photoName = filename
-        user.photo = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images', "images", "profil", username, filename)
+        user.photo = os.path.join("uploads", "images", "profil", username, filename)
         user.save()
 
         return jsonify({"message": "Image uploaded successfully"}), 200
@@ -455,7 +464,9 @@ def delete_patient(patient_id):
     except Patient.DoesNotExist:
         return jsonify({"message": "Patient non trouvé"}), 404
 
-    profil_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images','profil', patient.username)
+    profil_folder = os.path.join(
+        app.config["UPLOAD_FOLDER"], "uploads", "images", "profil", patient.username
+    )
     try:
         shutil.rmtree(profil_folder)
     except OSError:
@@ -463,8 +474,15 @@ def delete_patient(patient_id):
     # Supprimer le patient des rendez-vous associés
     # for rdv in patient.rdv:
     #     rdv.delete()
-    if(len(patient.rdv)>0):
-        return jsonify({"message":"impossible to delete this patient, he is affected to appointment(s)"}), 403
+    if len(patient.rdv) > 0:
+        return (
+            jsonify(
+                {
+                    "message": "impossible to delete this patient, he is affected to appointment(s)"
+                }
+            ),
+            403,
+        )
     patient.delete()
     return jsonify({"message": "Patient supprimé avec succès"}), 200
 
@@ -475,10 +493,10 @@ def delete_patient(patient_id):
 
 # ############################### la creation de dermatologue ###############################
 @app.route("/api/users/dermatologue/create", methods=["POST"])
-# @token_required
+@token_required
 # @login_required
 # @admin_required
-def create_dermatologue():
+def create_dermatologue(current_user):
     data = request.get_json()
     codeEmp = data.get("codeEmp")
     username = data.get("username")
@@ -542,10 +560,10 @@ def create_dermatologue():
 
 # ############################### chercher tous les dermatologues #####################################
 @app.route("/api/users/dermatologue/all", methods=["GET"])
-# @token_required
+@token_required
 # @login_required
 # @admin_required
-def get_all_dermatologues():
+def get_all_dermatologues(current_user):
     dermatologues = Dermatologue.objects.all()
 
     dermatologues_data = [convert_objet_to_dict(derm) for derm in dermatologues]
@@ -565,7 +583,13 @@ def delete_dermatologue(dermatologue_id):
     except Dermatologue.DoesNotExist:
         return jsonify({"message": "Dermatologue non trouvé"}), 404
 
-    profil_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images','profil', dermatologue.username)
+    profil_folder = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        "uploads",
+        "images",
+        "profil",
+        dermatologue.username,
+    )
     try:
         shutil.rmtree(profil_folder)
     except OSError:
@@ -573,8 +597,15 @@ def delete_dermatologue(dermatologue_id):
     # Supprimer le dermatologue des rendez-vous associés
     # for rdv in dermatologue.rdv:
     #     Dermatologue.objects(_id=dermatologue._id).update(pull__rdv=rdv)
-    if(len(dermatologue.rdv)>0):
-        return jsonify({"message":"impossible to delete this doctor, he is affected to appointment(s)"}), 403
+    if len(dermatologue.rdv) > 0:
+        return (
+            jsonify(
+                {
+                    "message": "impossible to delete this doctor, he is affected to appointment(s)"
+                }
+            ),
+            403,
+        )
 
     dermatologue.delete()
     return jsonify({"message": "Dermatologue supprimé avec succès"}), 200
@@ -615,12 +646,15 @@ def update_dermatologue(dermatologue_id):
 @app.route("/api/medecin/patients/<string:medecin_id>", methods=["GET"])
 def get_patients_for_medecin(medecin_id):
     rdvs = Rendez_vous.objects(medecin=medecin_id).all()
-    patients = []
+    
+    unique_patients = set()
+    
     for rdv in rdvs:
-        patients.append(rdv.patient)
-
-    patients_data = [convert_objet_to_dict(patient) for patient in patients]
+        unique_patients.add(rdv.patient)
+    
+    patients_data = [convert_objet_to_dict(patient) for patient in unique_patients]
     return jsonify(patients_data), 200
+
 
 
 # ###########################################################################################
@@ -629,10 +663,10 @@ def get_patients_for_medecin(medecin_id):
 
 # ############################### la creation de secretaire ################################
 @app.route("/api/users/secretaire/create", methods=["POST"])
-# @token_required
+@token_required
 # @login_required
 # @admin_required
-def create_secretaire():
+def create_secretaire(current_user):
     data = request.get_json()
     codeEmp = data.get("codeEmp")
     username = data.get("username")
@@ -697,10 +731,10 @@ def create_secretaire():
 
 # ############################### get all secretaire ########################################
 @app.route("/api/users/secretaires", methods=["GET"])
-# @token_required
+@token_required
 # @login_required
 # @admin_required
-def get_secretaires():
+def get_secretaires(current_user):
     secretaires = Secretaire.objects.all()
     secretaires_data = [convert_objet_to_dict(secretaire) for secretaire in secretaires]
     return jsonify(secretaires_data), 200
@@ -742,7 +776,9 @@ def delete_secretaire(secretaire_id):
         secretaire = Secretaire.objects.get(pk=secretaire_id)
     except Secretaire.DoesNotExist:
         return jsonify({"message": "Secrétaire non trouvé"}), 404
-    profil_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images','profil', secretaire.username)
+    profil_folder = os.path.join(
+        app.config["UPLOAD_FOLDER"], "uploads", "images", "profil", secretaire.username
+    )
     try:
         shutil.rmtree(profil_folder)
     except OSError:
@@ -808,11 +844,33 @@ def delete_rdv(rdv_id):
     if rdv.patient:
         Patient.objects(_id=rdv.patient._id).update(pull__rdv=rdv)
 
-    for consultation in rdv.consultations:
-        formatted_datetime = consultation.dateConsult.strftime("%Y-%m-%d_%H-%M-%S")
+    if rdv.consultation:
+        for diagnostic in rdv.consultation.diagnostics:
+            formatted_datetime = diagnostic.dateDiagnostic.strftime("%Y-%m-%d_%H-%M-%S")
+            consult_folder = os.path.join(
+                app.config["UPLOAD_FOLDER"],
+                "uploads",
+                "images",
+                "consultation",
+                rdv.patient.username,
+                formatted_datetime,
+            )
+            try:
+                shutil.rmtree(consult_folder)
+            except OSError:
+                pass
+
+            try:
+                diagnostic.delete()
+            except Diagnostic.DoesNotExist:
+                pass
+
         consult_folder = os.path.join(
-            app.config["UPLOAD_FOLDER"],'uploads','images','consultation',
-            consultation.rdv.patient.username
+            app.config["UPLOAD_FOLDER"],
+            "uploads",
+            "images",
+            "consultation",
+            rdv.patient.username,
         )
         try:
             shutil.rmtree(consult_folder)
@@ -820,7 +878,7 @@ def delete_rdv(rdv_id):
             pass
 
         try:
-            consultation.delete()
+            rdv.consultation.delete()
         except Consultation.DoesNotExist:
             pass
 
@@ -863,26 +921,21 @@ def get_rdv_by_patient(patient_id):
     return jsonify(rdv_data), 200
 
 
-#################################### get doctor rdv by day #################################################
-@app.route("/api/rendez_vous/dermatologue/today/<string:derm_id>", methods=["GET"])
-def get_dermatologue_today_rdv(derm_id):
-    try:
-        derms = Dermatologue.objects.get(pk=derm_id)
-    except Dermatologue.DoesNotExist:
-        return jsonify({"message": "Dermatologue introuvable"}), 404
-   
+#################################### get day rdv #################################################
+@app.route("/api/rendez_vous/today", methods=["GET"])
+def get_today_rdv():
     today = datetime.datetime.today()
-    # print(today)
-    # # Filtrez les rendez-vous pour n'inclure que ceux d'aujourd'hui
-    # rdvs = Rendez_vous.objects.filter(medecin=derms, dateDebutRdv__date=today).order_by("-dateDebutRdv")
     start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
     end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
 
     # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
-    rdvs = Rendez_vous.objects.filter(Q(medecin=derms) & Q(dateDebutRdv__gte=start_of_day) & Q(dateDebutRdv__lte=end_of_day)).order_by("-dateDebutRdv")
+    rdvs = Rendez_vous.objects.filter(
+        Q(dateDebutRdv__gte=start_of_day) & Q(dateDebutRdv__lte=end_of_day)
+    ).order_by("-dateDebutRdv")
 
     rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
     return jsonify(rdv_data), 200
+
 
 #################################### get rdv by medecin #################################################
 @app.route("/api/rendez_vous/dermatologue/<string:derm_id>", methods=["GET"])
@@ -891,7 +944,7 @@ def get_rdv_by_dermatologue(derm_id):
         derms = Dermatologue.objects.get(pk=derm_id)
     except Dermatologue.DoesNotExist:
         return jsonify({"message": "Dermatologue introuvable"}), 404
-   
+
     today = date.today()
 
     # Filtrez les rendez-vous pour n'inclure que ceux d'aujourd'hui
@@ -900,6 +953,52 @@ def get_rdv_by_dermatologue(derm_id):
     rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
     return jsonify(rdv_data), 200
 
+#################################### get doctor futur rdv #################################################
+@app.route("/api/rdv/dermatologue/futur/<string:derm_id>", methods=["GET"])
+def medecin_futur_rdv(derm_id):
+    try:
+        derms = Dermatologue.objects.get(pk=derm_id)
+    except Dermatologue.DoesNotExist:
+        return jsonify({"message": "Dermatologue introuvable"}), 404
+
+    today = datetime.datetime.today()
+   
+    start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
+    end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
+
+    # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
+    rdvs = Rendez_vous.objects.filter(
+        Q(medecin=derms)
+        & Q(dateDebutRdv__gte=start_of_day)
+    ).order_by("-dateDebutRdv")
+
+    rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
+    return jsonify(rdv_data),200
+
+#################################### get doctor day rendez-vous #################################################
+@app.route("/api/rendez-vous/dermatologue/today/<string:derm_id>", methods=["GET"])
+def get_dermatologue_today_rdv(derm_id):
+    try:
+        derms = Dermatologue.objects.get(pk=derm_id)
+    except Dermatologue.DoesNotExist:
+        return jsonify({"message": "Dermatologue introuvable"}), 404
+
+    today = datetime.datetime.today()
+    # print(today)
+    # # Filtrez les rendez-vous pour n'inclure que ceux d'aujourd'hui
+    # rdvs = Rendez_vous.objects.filter(medecin=derms, dateDebutRdv__date=today).order_by("-dateDebutRdv")
+    start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
+    end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
+
+    # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
+    rdvs = Rendez_vous.objects.filter(
+        Q(medecin=derms)
+        & Q(dateDebutRdv__gte=start_of_day)
+        & Q(dateDebutRdv__lte=end_of_day)
+    ).order_by("-dateDebutRdv")
+    print("rdvs : ")
+    rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
+    return jsonify(rdv_data),200
 
 ######################################## update rendez vous ##############################################
 @app.route("/api/rendez_vous/update/<string:rdv_id>", methods=["PUT"])
@@ -923,31 +1022,9 @@ def update_rdv(rdv_id):
     return jsonify(rdv_data), 200
 
 
-####################################################### les rdv d'un medecin avec un patient donné ##########################################
-@app.route(
-    "/api/rdv/medecin/patient/<string:medecin_id>/<string:patient_id>", methods=["GET"]
-)
-def rdv_medecin_patient(medecin_id, patient_id):
-    try:
-        medecin = Dermatologue.objects.get(pk=medecin_id)
-    except Dermatologue.DoesNotExist:
-        return jsonify({"message": "doctor not found"}), 400
-
-    try:
-        patient = Patient.objects.get(pk=patient_id)
-    except Patient.DoesNotExist:
-        return jsonify({"message": "patient not found"}), 400
-
-    rdvs = Rendez_vous.objects.filter(medecin=medecin, patient=patient).order_by(
-        "-dateDebutRdv"
-    )
-    rdvs_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
-    return jsonify(rdvs_data), 200
-
-
 #################################################################################################################################
 ######################################################################## Gestion consultation #####################################
-@app.route("/api/consultations/create/<string:rdv_id>", methods=["POST"])
+@app.route("/api/consultation/create/<string:rdv_id>", methods=["POST"])
 def remplir_consultation(rdv_id):
     data = request.get_json()
 
@@ -956,113 +1033,16 @@ def remplir_consultation(rdv_id):
     except Rendez_vous.DoesNotExist:
         return json({"message": "rendez-vous inexistant"}), 404
 
-    dateConsult = data.get("dateConsult")
-    descripSymptome = data.get("descripSymptome")
-    consultation = Consultation(
-        dateConsult=dateConsult, descripSymptome=descripSymptome
-    )
+    consultation = Consultation()
     consultation.rdv = rdv
     consultation.save()
 
-    rdv.consultations.append(consultation)
+    rdv.statut = True
+    rdv.consultation = consultation
     rdv.save()
 
     consultation_data = convert_objet_to_dict(consultation)
     return jsonify(consultation_data), 200
-
-
-####################################################### lancer le diagnostic de la consultation ################################################################
-@app.route("/api/consult/diagnostic/<string:consult_id>", methods=["PUT"])
-def diagnostic_maladie(consult_id):
-    try:
-        consultation = Consultation.objects.get(pk=consult_id)
-    except Consultation.DoesNotExist:
-        return jsonify({"message": "consultation not found"}), 400
-
-    # je vais inserer le model ici
-    efficient = get_model()
-    efficient.load_weights(
-        "efficient.h5"
-    )  # le même modèle que je t'ai envoyé ms cette fois-ci on va servir juste de ses poids
-    classe = {0: "akiec", 1: "bcc", 2: "bkl", 3: "df", 4: "mel", 5: "nv", 6: "vasc"}
-
-    for key, value in classe.items():
-        try:
-            maladie = Maladie.objects.get(nom=value)
-            consultation.maladies.append(maladie)
-            print(maladie.nom)
-        except Maladie.DoesNotExist:
-            return jsonify({"message": "Diseas not found"}), 404
-
-    file_path = consultation.imagePath
-    test_image = load_img(file_path, target_size=(224, 224))
-    test_image = img_to_array(test_image)
-    test_image = preprocess_input(np.expand_dims(test_image, axis=0))
-    # Print what the top predicted class is
-    preds = efficient.predict(test_image)
-    # A list of different probabilities outputed by the model
-    preds = preds.tolist()
-    # We choose the highest prediction
-    max_value = max(preds[0])
-    # Index of the highest prediction is the label of the predicted class
-    max_index = preds[0].index(max_value)
-    print(preds)
-    # Get class name from label predicted
-    print("Predicted:", classe[max_index])
-    try:
-        maladie = Maladie.objects.get(nom=classe[max_index])
-    except Maladie.DoesNotExist:
-        return jsonify({"message": "Maladie non repertoriée"}), 404
-
-    consultation.maladie = maladie
-    formatted_value = "{:.2f}".format(max_value * 100)
-    consultation.probability = float(formatted_value)
-    consultation.probabilities = [
-        float("{:.2f}".format(value * 100)) for value in preds[0]
-    ]
-    consultation.save()
-
-    consultation_data = convert_objet_to_dict(consultation)
-
-    return jsonify(consultation_data), 200
-
-
-######################################################### upload image de consultation ######################################################
-
-
-@app.route("/api/consultation/upload-image/<string:consult_id>", methods=["PUT"])
-def upload_consutation_image(consult_id):
-    consultation = Consultation.objects.get(pk=consult_id)
-
-    if "image" not in request.files:
-        return jsonify({"message": "No image part in the request"}), 400
-
-    image = request.files["image"]
-
-    if image.filename == "":
-        return jsonify({"message": "No selected file"}), 400
-
-    if image and allowed_file(image.filename):
-        filename = secure_filename(image.filename)
-        formatted_datetime = consultation.dateConsult.strftime("%Y-%m-%d_%H-%M-%S")
-        consult_folder = os.path.join(
-            app.config["UPLOAD_FOLDER"], 'uploads','images',"consultation",
-            consultation.rdv.patient.username,
-            formatted_datetime,
-        )
-        os.makedirs(consult_folder, exist_ok=True)
-        image_path = os.path.join(consult_folder, filename)
-        image.save(image_path)
-        consultation.imageName = os.path.join(
-            consult_folder,
-            filename
-        )
-        consultation.imagePath = image_path
-        consultation.save()
-        consultation_data = convert_objet_to_dict(consultation)
-        return jsonify(consultation_data), 200
-
-    return jsonify({"message": "Invalid file type"}), 400
 
 
 ################################################### all consultations ########################################################################
@@ -1084,35 +1064,84 @@ def get_consultation(consult_id):
     return jsonify(consult_data), 200
 
 
-################################################## update consultation #####################################################################
-@app.route("/api/consultation/update/<string:consult_id>", methods=["PUT"])
-def update_consultation(consult_id):
-    data = request.get_json()
+####################################################### les vistes d'un medecin avec un patient donné ##########################################
+@app.route(
+    "/api/visite/medecin/patient/<string:medecin_id>/<string:patient_id>",
+    methods=["GET"],
+)
+def consultation_medecin_patient(medecin_id, patient_id):
     try:
-        consultation = Consultation.objects.get(pk=consult_id)
-    except Consultation.DoesNotExist:
-        return jsonify({"message": "consultation introuvable"}), 404
+        medecin = Dermatologue.objects.get(pk=medecin_id)
+    except Dermatologue.DoesNotExist:
+        return jsonify({"message": "doctor not found"}), 400
 
-    consultation.prescription = data.get("prescription")
-    consultation.description = data.get("description")
-    consultation.save()
-    consultation_data = convert_objet_to_dict(consultation)
-    return jsonify(consultation_data), 201
-
-
-################################################## Consultations par rdv  #####################################################################
-@app.route("/api/rdv/consultation/<string:rdv_id>", methods=["GET"])
-def consultation_by_rdv(rdv_id):
     try:
-        rdv = Rendez_vous.objects.get(pk=rdv_id)
-    except Rendez_vous.DoesNotExist:
-        return jsonify({"message": "rdv introuvable"}), 404
+        patient = Patient.objects.get(pk=patient_id)
+    except Patient.DoesNotExist:
+        return jsonify({"message": "patient not found"}), 400
 
-    consultations = Consultation.objects.filter(rdv=rdv).order_by("-dateConsult")
-    consultation_data = [
-        convert_objet_to_dict(consultation) for consultation in consultations
-    ]
-    return jsonify(consultation_data), 201
+    rdvs = Rendez_vous.objects.filter(
+        medecin=medecin, patient=patient, statut=True
+    ).order_by("-dateDebutRdv")
+
+    consultations = []
+    for rdv in rdvs:
+        consultations.append(rdv.consultation)
+
+    consultation_data = [convert_objet_to_dict(consult) for consult in consultations]
+    return jsonify(consultation_data), 200
+
+
+#################################### get doctor day visite #################################################
+@app.route("/api/visite/dermatologue/today/<string:derm_id>", methods=["GET"])
+def get_dermatologue_today_visite(derm_id):
+    try:
+        derms = Dermatologue.objects.get(pk=derm_id)
+    except Dermatologue.DoesNotExist:
+        return jsonify({"message": "Dermatologue introuvable"}), 404
+
+    today = datetime.datetime.today()
+    # print(today)
+    # # Filtrez les rendez-vous pour n'inclure que ceux d'aujourd'hui
+    # rdvs = Rendez_vous.objects.filter(medecin=derms, dateDebutRdv__date=today).order_by("-dateDebutRdv")
+    start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
+    end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
+
+    # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
+    rdvs = Rendez_vous.objects.filter(
+        Q(medecin=derms)
+        & Q(dateDebutRdv__gte=start_of_day)
+        & Q(dateDebutRdv__lte=end_of_day)
+        & Q(statut=True)
+    ).order_by("-dateDebutRdv")
+    consultations = []
+    for rdv in rdvs:
+        consultations.append(rdv.consultation)
+    consultation_data = [convert_objet_to_dict(consult) for consult in consultations]
+    return jsonify(consultation_data), 200
+
+
+####################################################### les vistes d'un patient donné ##########################################
+@app.route(
+    "/api/visite/patient/<string:patient_id>",
+    methods=["GET"],
+)
+def consultation_patient(patient_id):
+    try:
+        patient = Patient.objects.get(pk=patient_id)
+    except Patient.DoesNotExist:
+        return jsonify({"message": "patient not found"}), 400
+
+    rdvs = Rendez_vous.objects.filter(patient=patient, statut=True).order_by(
+        "-dateDebutRdv"
+    )
+
+    consultations = []
+    for rdv in rdvs:
+        consultations.append(rdv.consultation)
+
+    consultation_data = [convert_objet_to_dict(consult) for consult in consultations]
+    return jsonify(consultation_data), 200
 
 
 ################################################### supprimer consultation ######################################################
@@ -1123,35 +1152,255 @@ def delete_consultation(consult_id):
     except Consultation.DoesNotExist:
         return jsonify({"message": "consultation non trouvée"}), 404
 
-    formatted_datetime = consultation.dateConsult.strftime("%Y-%m-%d_%H-%M-%S")
-    consult_folder = os.path.join(
-        app.config["UPLOAD_FOLDER"],'uploads','images',"consultation",
-        consultation.rdv.patient.username,
-        formatted_datetime
-    )
+    if consultation.diagnostics:
+        for diagnostic in consultation.diagnostics:
+            img_folder = os.path.join(app.config["UPLOAD_FOLDER"], diagnostic.imagePath)
+            try:
+                shutil.rmtree(img_folder)
+                diagnostic.delete()
+            except OSError:
+                pass
+        img_folder = os.path.join(app.config["UPLOAD_FOLDER"], "uploads",
+            "images",
+            "consultation",
+            consultation.rdv.patient.username)
+        try:
+            shutil.rmtree(img_folder)
+            diagnostic.delete()
+        except OSError:
+            pass
     rdv = Rendez_vous.objects.get(pk=consultation.rdv._id)
-    rdv.consultations.remove(consultation)
+    rdv.consultation = None
+    rdv.statut=False
     rdv.save()
-    try:
-        shutil.rmtree(consult_folder)
-    except OSError:
-        pass
-
     consultation.delete()
 
     return jsonify({"message": "consultation supprimée avec succès"}), 200
 
 
+################################################## update consultation(visite) ==> changer de medecin #####################################################################
+@app.route(
+    "/api/consultation/update/<string:consult_id>/<string:medecin_id>", methods=["PUT"]
+)
+def update_consultation(consult_id, medecin_id):
+    data = request.get_json()
+    try:
+        consultation = Consultation.objects.get(pk=consult_id)
+    except Consultation.DoesNotExist:
+        return jsonify({"message": "consultation introuvable"}), 404
+    try:
+        medecin = Dermatologue.objects.get(pk=medecin_id)
+    except Dermatologue.DoesNotExist:
+        return jsonify({"message": "doctor not found"}), 404
+
+    rdv = Consultation.objects.get(consultation=consultation)
+    rdv.medecin = medecin
+    rdv.save()
+    consultation_data = convert_objet_to_dict(consultation)
+    return jsonify(consultation_data), 201
+
+
+# ################################################## Consultations par rdv  #####################################################################
+# @app.route("/api/rdv/consultation/<string:rdv_id>", methods=["GET"])
+# def consultation_by_rdv(rdv_id):
+#     try:
+#         rdv = Rendez_vous.objects.get(pk=rdv_id)
+#     except Rendez_vous.DoesNotExist:
+#         return jsonify({"message": "rdv introuvable"}), 404
+
+#     consultations = Consultation.objects.filter(rdv=rdv).order_by("-dateConsult")
+#     consultation_data = [
+#         convert_objet_to_dict(consultation) for consultation in consultations
+#     ]
+#     return jsonify(consultation_data), 201
+
+
+# ################################################### supprimer consultation ######################################################
+# @app.route("/api/consultation/delete/<string:consult_id>", methods=["DELETE", "PUT"])
+# def delete_diagnostic(consult_id):
+#     try:
+#         consultation = Consultation.objects.get(pk=consult_id)
+#     except Consultation.DoesNotExist:
+#         return jsonify({"message": "consultation non trouvée"}), 404
+
+#     formatted_datetime = consultation.dateConsult.strftime("%Y-%m-%d_%H-%M-%S")
+#     consult_folder = os.path.join(
+#         app.config["UPLOAD_FOLDER"],'uploads','images',"consultation",
+#         consultation.rdv.patient.username,
+#         formatted_datetime
+#     )
+#     rdv = Rendez_vous.objects.get(pk=consultation.rdv._id)
+#     rdv.consultations.remove(consultation)
+#     rdv.save()
+#     try:
+#         shutil.rmtree(consult_folder)
+#     except OSError:
+#         pass
+
+#     consultation.delete()
+
+#     return jsonify({"message": "consultation supprimée avec succès"}), 200
+
+###############################################################################################################################################################
+##################################################### gestion diagnostic ######################################################################################
+
+
+###################################################### create diagnostic #####################################################################################
+@app.route("/api/diagnostic/create/<string:consult_id>", methods=["POST"])
+def new_diagnostic(consult_id):
+    data = request.get_json()
+    try:
+        consultation = Consultation.objects.get(pk=consult_id)
+    except Diagnostic.DoesNotExist:
+        return jsonify({"message": "consultation not found"}), 400
+
+    descripSymptome = data.get("descripSymptome")
+    diagnostic = Diagnostic(descripSymptome=descripSymptome)
+    diagnostic.consultation = consultation
+    diagnostic.save()
+
+    consultation.diagnostics.append(diagnostic)
+    consultation.save()
+
+    diagnostic_data = convert_objet_to_dict(diagnostic)
+
+    return jsonify(diagnostic_data), 200
+
+
+######################################################### upload image diagnostic ######################################################
+@app.route("/api/diagnostic/upload-image/<string:diagnostic_id>", methods=["PUT"])
+def upload_consutation_image(diagnostic_id):
+    diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
+
+    if "image" not in request.files:
+        return jsonify({"message": "No image part in the request"}), 400
+
+    image = request.files["image"]
+
+    if image.filename == "":
+        return jsonify({"message": "No selected file"}), 400
+
+    if image and allowed_file(image.filename):
+        filename = secure_filename(image.filename)
+        formatted_datetime = diagnostic.dateDiagnostic.strftime("%Y-%m-%d_%H-%M-%S")
+        diagnostic_folder = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            "uploads",
+            "images",
+            "consultation",
+            diagnostic.consultation.rdv.patient.username,
+            formatted_datetime,
+        )
+        os.makedirs(diagnostic_folder, exist_ok=True)
+        image_path = os.path.join(diagnostic_folder, filename)
+        image.save(image_path)
+        diagnostic.imageName = filename
+        diagnostic.imagePath = os.path.join(
+            "uploads",
+            "images",
+            "consultation",
+            diagnostic.consultation.rdv.patient.username,
+            formatted_datetime,
+            filename,
+        )
+        diagnostic.save()
+        diagnostic_data = convert_objet_to_dict(diagnostic)
+        return jsonify(diagnostic_data), 200
+
+    return jsonify({"message": "Invalid file type"}), 400
+
+############################################################# diagnostic by id ########################################################################################
+@app.route("/api/diagnostic/<string:diagnostic_id>", methods=["GET"])
+def get_diagnostic(diagnostic_id):
+    try:
+        diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
+    except Diagnostic.DoesNotExist:
+        return jsonify({"message": "Diagnostic not found"}), 400
+    diagnostic_data = convert_objet_to_dict(diagnostic)
+    return jsonify(diagnostic_data), 200
+############################################################## update diagnostic==> faire des prescriptions ############################################################
+@app.route("/api/diagnostic/update/<string:diagnostic_id>", methods=["PUT"])
+def diagnostic_update(diagnostic_id):
+    data = request.get_json()
+    try:
+        diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
+    except Diagnostic.DoesNotExist:
+        return jsonify({"message": "Diagnostic not found"}), 400
+
+    diagnostic.prescription = data.get("prescription", diagnostic.prescription)
+    diagnostic.description = data.get("description", diagnostic.description)
+
+    diagnostic.save()
+    diagnostic_data = convert_objet_to_dict(diagnostic)
+    return jsonify(diagnostic_data), 200
+
+
+####################################################### lancer le diagnostic de la consultation ################################################################
+@app.route("/api/consult/diagnostic/<string:diagnostic_id>", methods=["PUT"])
+def diagnostic_maladie(diagnostic_id):
+    try:
+        diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
+    except Diagnostic.DoesNotExist:
+        return jsonify({"message": "Diagnostic not found"}), 400
+
+    # je vais inserer le model ici
+    efficient = get_model()
+    efficient.load_weights(
+        "efficient.h5"
+    )  # le même modèle que je t'ai envoyé ms cette fois-ci on va servir juste de ses poids
+    classe = {0: "akiec", 1: "bcc", 2: "bkl", 3: "df", 4: "mel", 5: "nv", 6: "vasc"}
+
+    for key, value in classe.items():
+        try:
+            maladie = Maladie.objects.get(nom=value)
+            diagnostic.maladies.append(maladie)
+            print(maladie.nom)
+        except Maladie.DoesNotExist:
+            return jsonify({"message": "Diseas not found"}), 404
+
+    file_path = os.path.join(app.config["UPLOAD_FOLDER"], diagnostic.imagePath)
+    test_image = load_img(file_path, target_size=(224, 224))
+    test_image = img_to_array(test_image)
+    test_image = preprocess_input(np.expand_dims(test_image, axis=0))
+    # Print what the top predicted class is
+    preds = efficient.predict(test_image)
+    # A list of different probabilities outputed by the model
+    preds = preds.tolist()
+    # We choose the highest prediction
+    max_value = max(preds[0])
+    # Index of the highest prediction is the label of the predicted class
+    max_index = preds[0].index(max_value)
+    print(preds)
+    # Get class name from label predicted
+    print("Predicted:", classe[max_index])
+    try:
+        maladie = Maladie.objects.get(nom=classe[max_index])
+    except Maladie.DoesNotExist:
+        return jsonify({"message": "Maladie non repertoriée"}), 404
+
+    diagnostic.maladie = maladie
+    formatted_value = "{:.2f}".format(max_value * 100)
+    diagnostic.probability = float(formatted_value)
+    diagnostic.probabilities = [
+        float("{:.2f}".format(value * 100)) for value in preds[0]
+    ]
+    diagnostic.save()
+
+    diagnostic_data = convert_objet_to_dict(diagnostic)
+
+    return jsonify(diagnostic_data), 200
+
+
 ######################################################### Valider un diagnostic #############################################################
 @app.route(
-    "/api/diagnostic/validation/<string:consult_id>/<string:maladie_id>",
+    "/api/diagnostic/validation/<string:diagnostic_id>/<string:maladie_id>",
     methods=["PUT"],
 )
-def valide_diagnostic(consult_id, maladie_id):
+def valide_diagnostic(diagnostic_id, maladie_id):
     try:
-        consult = Consultation.objects.get(pk=consult_id)
-    except Consultation.DoesNotExist:
-        return jsonify({"message": "consultation not found"}), 404
+        diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
+    except Diagnostic.DoesNotExist:
+        return jsonify({"message": "diagnostic not found"}), 404
 
     try:
         maladie = Maladie.objects.get(pk=maladie_id)
@@ -1163,28 +1412,74 @@ def valide_diagnostic(consult_id, maladie_id):
     except Stade.DoesNotExist:
         return jsonify({"message": "level not found"}), 404
 
-    if consult.maladie != maladie:
-        consult.maladie = maladie
+    if diagnostic.maladie != maladie:
+        diagnostic.maladie = maladie
 
     image_stade = ImageStade()
-    file_name = consult.imageName.split("\\")[-1]
+    file_name = diagnostic.imageName
     image_stade.title = file_name
     image_stade.imagePath = os.path.join(
-        app.config['UPLOAD_FOLDER'],'uploads','images', "maladies", stade.maladie.nom, stade.stade, file_name
+        "uploads", "images", "maladies", stade.maladie.nom, stade.stade, file_name
     )
     image_stade.stade = stade
-    print(consult.imagePath)
-    source_file_path = source_file_path = consult.imagePath
+    print(diagnostic.imagePath)
+    source_file_path = os.path.join(
+        app.config["UPLOAD_FOLDER"],diagnostic.imagePath)
     destination_file_path = os.path.join(
-        app.config["UPLOAD_FOLDER"],'uploads','images',"maladies", stade.maladie.nom, stade.stade
+        app.config["UPLOAD_FOLDER"],
+        "uploads",
+        "images",
+        "maladies",
+        stade.maladie.nom,
+        stade.stade,
     )
     shutil.copy(source_file_path, destination_file_path)
 
     image_stade.save()
 
-    consult.save()
+    diagnostic.save()
 
     return jsonify({"message": "validation done successfully"}), 200
+
+################################################## diagnostics par consultation  #####################################################################
+@app.route("/api/consultation/diagnostics/<string:consult_id>", methods=["GET"])
+def diagnostics_by_consultation(consult_id):
+    try:
+        consultation = Consultation.objects.get(pk=consult_id)
+    except Consultation.DoesNotExist:
+        return jsonify({"message": "Consultation not found"}), 404
+
+    diagnostics = Diagnostic.objects.filter(consultation=consultation).order_by("-dateDiagnostic")
+    diagnostic_data = [
+        convert_objet_to_dict(diagnostic) for diagnostic in diagnostics
+    ]
+    return jsonify(diagnostic_data), 201
+
+################################################### supprimer consultation ######################################################
+@app.route("/api/diagnostic/delete/<string:diagnostic_id>", methods=["DELETE", "PUT"])
+def delete_diagnostic(diagnostic_id):
+    try:
+        diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
+    except Diagnostic.DoesNotExist:
+        return jsonify({"message": "Diagnostic not found"}), 404
+
+    formatted_datetime = diagnostic.dateDiagnostic.strftime("%Y-%m-%d_%H-%M-%S")
+    diagnostic_folder = os.path.join(
+        app.config["UPLOAD_FOLDER"],'uploads','images',"consultation",
+        diagnostic.consultation.rdv.patient.username,
+        formatted_datetime
+    )
+    consultation = Consultation.objects.get(pk=diagnostic.consultation._id)
+    consultation.diagnostics.remove(diagnostic)
+    consultation.save()
+    try:
+        shutil.rmtree(diagnostic_folder)
+    except OSError:
+        pass
+
+    diagnostic.delete()
+
+    return jsonify({"message": "diagnostic deleted successfully"}), 200
 
 
 ##############################################################################################################################################
@@ -1193,11 +1488,12 @@ def valide_diagnostic(consult_id, maladie_id):
 def create_maladie():
     data = request.get_json()
     nom = data.get("nom")
+    fullName = data.get("fullName")
     nom_lower = nom.lower()
     try:
         existing_maladie = Maladie.objects.get(nom=nom_lower)
     except Maladie.DoesNotExist:
-        maladie = Maladie(nom=nom_lower)
+        maladie = Maladie(nom=nom_lower, fullName=fullName)
         maladie.save()
 
         maladie_data = convert_objet_to_dict(maladie)
@@ -1236,6 +1532,7 @@ def maladie_update(maladie_id):
         return jsonify({"message": "maladie introuvable"}), 400
 
     maladie.nom = data.get("nom", maladie.nom)
+    maladie.fullName = data.get("fullName", maladie.fullName)
 
     maladie.save()
     maladie_data = convert_objet_to_dict(maladie)
@@ -1257,15 +1554,22 @@ def delete_maladie(maladie_id):
             # Supprimer l'image du dossier du stade
             # image_path = os.path.join(app.config['UPLOAD_FOLDER3'], f"{stade.maladie.nom}{stade.stade}", image.title)
             # Stade.objects(pk=image.stade._id).update(pull_images=image)
+            folder = os.path.join(app.config["UPLOAD_FOLDER"], image.imagePath)
             image.delete()
             try:
                 print(image.title)
-                os.remove(image.imagePath)
+                os.remove(folder)
             except OSError:
                 pass
 
         # Supprimer le dossier du stade
-        stade_folder = os.path.join(app.config["UPLOAD_FOLDER"],'uploads','images',"maladies", stade.maladie.nom)
+        stade_folder = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            "uploads",
+            "images",
+            "maladies",
+            stade.maladie.nom,
+        )
         try:
             shutil.rmtree(stade_folder)
         except OSError:
@@ -1341,15 +1645,21 @@ def delete_stade(stade_id):
 
     images = ImageStade.objects.filter(stade=stade)
     for image in images:
+        folder = os.path.join(app.config["UPLOAD_FOLDER"], image.imagePath)
         image.delete()
         try:
-            os.remove(image.imagePath)
+            os.remove(folder)
         except OSError:
             pass
 
     # Supprimer le dossier du stade
     stade_folder = os.path.join(
-        app.config["UPLOAD_FOLDER"],'uploads','images', "maladies", stade.maladie.nom, stade.stade
+        app.config["UPLOAD_FOLDER"],
+        "uploads",
+        "images",
+        "maladies",
+        stade.maladie.nom,
+        stade.stade,
     )
     try:
         shutil.rmtree(stade_folder)
@@ -1380,7 +1690,12 @@ def create_image(stade_id):
 
         # Créez un sous-dossier pour la maladie si elle n'existe pas déjà
         maladie_folder = os.path.join(
-            app.config["UPLOAD_FOLDER"],'uploads','images',"maladies", stade.maladie.nom, stade.stade
+            app.config["UPLOAD_FOLDER"],
+            "uploads",
+            "images",
+            "maladies",
+            stade.maladie.nom,
+            stade.stade,
         )
         os.makedirs(maladie_folder, exist_ok=True)
 
@@ -1389,7 +1704,7 @@ def create_image(stade_id):
 
         title = filename
         image_path = os.path.join(
-            app.config["UPLOAD_FOLDER"],'uploads', "images", "maladies", stade.maladie.nom, stade.stade, filename
+            "uploads", "images", "maladies", stade.maladie.nom, stade.stade, filename
         )
 
         imageStade = ImageStade(title=title, imagePath=image_path, stade=stade)
@@ -1401,6 +1716,7 @@ def create_image(stade_id):
 
     return jsonify({"message": "Invalid file type"}), 400
 
+
 ################################################## supprimer image stade #################################################
 @app.route("/api/maladie/stade/image/delete/<string:img_id>", methods=["DELETE"])
 def delete_image_stade(img_id):
@@ -1410,9 +1726,9 @@ def delete_image_stade(img_id):
         return jsonify({"message": "Image introuvable"}), 404
 
     # Stade.objects(pk=image.stade._id).update(pull_images=image)
-
+    folder = os.path.join(app.config["UPLOAD_FOLDER"], image.imagePath)
     try:
-        os.remove(image.imagePath)
+        os.remove(folder)
     except OSError:
         pass
     image.delete()

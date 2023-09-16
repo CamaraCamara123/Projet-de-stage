@@ -10,31 +10,16 @@ import { faEdit, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Navigate } from 'react-router-dom';
 import { fetchPatientRdvs } from '../../components/fetchElement/fetchRdvs';
 import Transition from '../../constants/transition';
+import { fetchPatientVisite } from '../../components/fetchElement/fetchConsultations';
 
 
 export default function Profile() {
 
-  const { patient, medecin, secretaire, updatePatient, userData, updateRdvs } = useUserData();
+  const { patient, medecin, secretaire, updatePatient, userData, path,updateConsultations } = useUserData();
   const [user, setUser] = useState();
   const [showModal, setShowModal] = useState(false);
-  const [photo, setPhoto] = useState()
   const [docs, setDocs] = useState(false)
 
-  // const handlerPhoto = async (user_id)=>{
-  //   const token = localStorage.getItem('token');
-  //     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  //       try {
-  //           const response = await axios.get(`http://192.168.11.104:5000/api/patients/${user_id}/image`, {
-  //               headers: {
-  //                   'Content-Type': 'application/json'
-  //               }
-  //           });
-  //           setPhoto(response.data);
-  //           console.log(response.data)
-  //       } catch (error) {
-  //           console.error('Erreur lors de la récupération de la photo :', error);
-  //       }
-  // }
   useEffect(() => {
     if (patient) {
       setUser(patient);
@@ -52,7 +37,7 @@ export default function Profile() {
 
   const fdocsMedical = async () => {
     updatePatient(user)
-    fetchPatientRdvs(user._id, updateRdvs)
+    fetchPatientVisite(path,user._id, updateConsultations)
     setDocs(true)
   }
 
@@ -66,7 +51,7 @@ export default function Profile() {
       <Transition>
         <Modal show={showModal} onHide={handleCloseModal}>
           <Modal.Header closeButton>
-            <Modal.Title className='text-align-center'>PROFIL UTILISATEUR</Modal.Title>
+            <Modal.Title className='text-align-center'>USER PROFILE</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             {/* <MDBContainer className="py-5 h-100"> */}
@@ -76,18 +61,18 @@ export default function Profile() {
                   <MDBRow className="g-0">
                     <MDBCol md="4" className="gradient-custom text-center text-white"
                       style={{ borderTopLeftRadius: '.5rem', borderBottomLeftRadius: '.5rem' }}>
-                      <MDBCardImage src={user.photo}
-                        alt={user.photoName} className="my-5 cercle" style={{ width: '80px', borderRadius: "50%" }} fluid />
+                      <MDBCardImage
+                        src={`${path}/uploads/${user.photo}`}
+                        alt={user.photoName}
+                        className="my-5 cercle"
+                        style={{ width: '80px', borderRadius: '50%' }}
+                        fluid
+                      />
                       <MDBTypography tag="h5">{user.nom} {user.prenom}</MDBTypography>
                       <MDBCardText>{user.role[0]}</MDBCardText>
-                      {/* {(patient || medecin) && <span>
-                          <button className='btn btn-success mb-2' onClick={() => frdv(patient._id)}>
-                            <FontAwesomeIcon icon={faEdit} />Mes rdv
-                          </button>
-                        </span>} */}
-                      {(user.role.includes('patient') && !user.role.includes('admin')) && <span>
+                      {!userData.role.includes('secretaire')&&!userData.role.includes('admin') && <span>
                         <button className='btn btn-primary' onClick={() => fdocsMedical(patient._id)}>
-                          <FontAwesomeIcon icon={faEyeSlash} />Docs medical
+                          <FontAwesomeIcon icon={faEyeSlash} />Medical docs
                         </button>
                       </span>}
                     </MDBCol>
@@ -98,11 +83,11 @@ export default function Profile() {
                         <MDBRow className="pt-1">
                           <MDBCol size="6" className="mb-3">
                             <MDBTypography tag="h6">Email</MDBTypography>
-                            <MDBCardText className="text-muted">info@example.com</MDBCardText>
+                            <MDBCardText className="text-muted">{user.username}</MDBCardText>
                           </MDBCol>
                           <MDBCol size="6" className="mb-3">
                             <MDBTypography tag="h6">Phone</MDBTypography>
-                            <MDBCardText className="text-muted">123 456 789</MDBCardText>
+                            <MDBCardText className="text-muted">{user.tel}</MDBCardText>
                           </MDBCol>
                         </MDBRow>
 
@@ -111,11 +96,11 @@ export default function Profile() {
                         <MDBRow className="pt-1">
                           <MDBCol size="6" className="mb-3">
                             <MDBTypography tag="h6">Email</MDBTypography>
-                            <MDBCardText className="text-muted">info@example.com</MDBCardText>
+                            <MDBCardText className="text-muted">{user.username}</MDBCardText>
                           </MDBCol>
                           <MDBCol size="6" className="mb-3">
                             <MDBTypography tag="h6">Phone</MDBTypography>
-                            <MDBCardText className="text-muted">123 456 789</MDBCardText>
+                            <MDBCardText className="text-muted">{user.tel}</MDBCardText>
                           </MDBCol>
                         </MDBRow>
 

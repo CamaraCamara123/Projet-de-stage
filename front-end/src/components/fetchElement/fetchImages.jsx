@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-export const fetchStadeImages = async (stade_id,updateImages) => {
+export const fetchStadeImages = async (path,stade_id,updateImages) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     try {
-        const response = await axios.get(`http://192.168.11.104:5000/api/maladie/stade/images/${stade_id}`, {
+        const response = await axios.get(`${path}/api/maladie/stade/images/${stade_id}`, {
             headers: {
                 'Content-Type': 'application/json'
             }

@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const fetchPatients = async (updatePatients) => {
+const fetchPatients = async (path,updatePatients) => {
     const token = localStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     console.log(token)
     try {
-        const response = await axios.get('http://192.168.11.104:5000/api/users/patient/all', {
+        const response = await axios.get(`${path}/api/users/patient/all`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization':`Bearer ${token}`

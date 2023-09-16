@@ -87,7 +87,7 @@
   margin: auto;
 }
 
-#btn-page{
+#btn-page {
   display: flex;
   justify-content: center;
   border-radius: 50px;
@@ -97,37 +97,162 @@
   margin-left: 5px;
 }
 
-#btn-page:active{
+/* #btn-page:active {
   background-color: blue;
   border: 2px, deepskyblue;
-}
-.pagination{
+} */
+
+.pagination {
   display: flex;
   align-content: center;
   align-self: center;
   justify-content: center;
 }
 
-.image-container{
+.image-container {
   display: flex;
   background-color: white;
   align-content: center;
   text-align: center;
 }
 
-.titre{
+.titre {
   font-size: xx-large;
   color: gray;
   font-style: italic;
 }
-.chat-container{
+
+.chat-container {
   align-content: stretch;
 }
+.titre-stade{
+  font-size: xx-large;
+  color: lightcyan;
+  font-style: italic;
+}
 
-.img-row{
+.titre-stade-container{
+  width: 80%;
+  margin: auto;
+  background-color: coral;
+  border-radius: 15%;
+  border: solid 2px gray;
+  margin-bottom: 8px;
+  align-self: center;
+}
+
+.active-btn, .notActive{
+  width: 40px;
+  border-radius: 40%;
+  color: white;
+  background-color: blue;
+  border: solid 1px gray;
+}
+
+.active-btn{
+  color: lightcyan;
+  background-color: darkblue;
+  border: solid 1px gray;
+}
+.img-row {
+  width: 90%;
+  margin: auto;
+  border-radius: 2%;
+  border: solid 4px gray;
+  justify-content: center;
+  align-self: center;
+  padding: 5px;
+  background-color: khaki;
+}
+
+.img-stade{
+  box-shadow: 10px 5px 5px grey;
+  border-radius: 2%;
+}
+.pagination-container{
+  width: 85%;
+  margin: auto;
+  align-self: center;
+  padding: 10px;
+}
+.button:hover {
+  background-color: lightgray;
+}
+
+.cell-with-events {
+  /* Styles pour les cellules contenant au moins un événement */
+  background-color: red;
+}
+
+.title-rdv {
+  align-self: center;
+  font-size: 60px;
+  padding: auto;
+  color: lightslategrey;
+
+}
+
+.title-container {
+  justify-content: center;
+  margin-bottom: 20px;
+  text-align: center;
+  background-color: khaki;
+  width: 100%;
+  border-radius: 30%;
+  border: 5px gray;
+}
+
+.rdv-container {
+  /* width: 90%;
+  margin: auto;
+  align-self: center; */
+}
+
+.btn-rdv {
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 55%;
+  
+  margin-bottom: 20px;
+}
+
+.main-container-rdv{
+  width: 90%;
+  margin: auto;
+  align-self: center;
+  margin-top: 10px;
+  border: solid 5px;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 10%;
+  background-color: dodgerblue;
+
+}
+
+.day-title,.hour-title{
+  color: blue;
+  align-self: center;
+  text-align: center;
+}
+.day-button, .selected, .notSelected{
+  width: 80px;
+  border-radius: 15%;
   justify-content: center;
 }
 
-.button:hover{
-  background-color: lightgray;
+.button-container, .hour-container{
+  width: 80%;
+  margin: auto;
+  justify-content: center;
+  border: solid 5px;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 10%;
+  background-color: white;
+}
+
+.selected{
+  background-color: blue;
+  color: lightcyan;
 }

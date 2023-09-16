@@ -10,7 +10,7 @@ function Login() {
   const { login, isLoggedIn } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { updateUserData } = useUserData();
+  const { path } = useUserData();
   const [errorMessage, setErrorMessage] = useState("");
 
   if (localStorage.getItem('user')) {
@@ -21,7 +21,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://192.168.11.104:5000/login', {
+      const response = await axios.post(`${path}/login`, {
         username,
         password,
       });

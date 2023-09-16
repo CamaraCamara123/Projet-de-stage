@@ -8,161 +8,69 @@ import { useUserData } from "../../contexts/UserDataContext";
 import { fetchConsultationsRdv } from "../fetchElement/fetchConsultations";
 import symptoms from "../../constants/list_symptoms";
 import Select from "react-select";
+import { fetchMedecinRdvs, fetchPatientRdvs, fetchRdvs } from "../fetchElement/fetchRdvs";
+import { Week, Month, Day, WorkWeek, TimelineViews, TimelineMonth, Agenda, ScheduleComponent, Inject } from '@syncfusion/ej2-react-schedule';
+import '@syncfusion/ej2-base/styles/material.css';
+import '@syncfusion/ej2-react-buttons/styles/material.css';
+import '@syncfusion/ej2-react-calendars/styles/material.css';
+import '@syncfusion/ej2-react-dropdowns/styles/material.css';
+import '@syncfusion/ej2-react-inputs/styles/material.css';
+import '@syncfusion/ej2-react-popups/styles/material.css';
+import '@syncfusion/ej2-react-schedule/styles/material.css';
 
 
-function Form_consultation({ open, rdv_id, consultationToUpdate }) {
+
+function Form_consultation({ open, consultationToUpdate }) {
     const [modalIsOpen, setModalIsOpen] = useState(open);
-    const [dateConsult, setdateConsult] = useState();
-    const [image, setImage] = useState()
-    const [description, setDescription] = useState("")
-    const [prescription, setPrescription] = useState("")
-    const [prescriptions, setPrescriptions] = useState([])
-    const [descripSymptome, setDescripSymptome] = useState(null);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const { updateConsultations, consultations, patients } = useUserData()
-    const [bouton, setBouton] = useState("save")
-    const [symptomes, setSyptomes] = useState([])
+    const { updateConsultations,} = useUserData()
+    const { medecins, path} = useUserData();
+    const [medecin, setMedecin] = useState([])
+    const [doctors, setDoctors] = useState();
 
-
-    useEffect(() => {
-        if (consultationToUpdate) {
-            setBouton("update")
-            setdateConsult(consultationToUpdate.dateConsult ? new Date(consultationToUpdate.dateConsult).toISOString().split('T')[0] : "");
-            setDescripSymptome(consultationToUpdate.descripSymptome || "")
-        }
-    }, [consultationToUpdate]);
-
-    ///////////////////////////// lancer le diagnostic///////////////
-    const handlerDiagnostic = async (consult_id) => {
-        try {
-            const response = await axios.put(`http://192.168.11.104:5000/api/consult/diagnostic/${consult_id}`);
-            if (response.status == 200) {
-                console.log('treatment done successfully !!!!');
-                fetchConsultationsRdv(rdv_id, updateConsultations);
-                setModalIsOpen(false);
-            }
-        } catch (error) {
-
-        }
-    }
-
-    //////////////////////////// image consultation \\\\\\\\\\\\\\\\
-    const createImage = async (consult_id, image) => {
-        const formData = new FormData();
-        formData.append("image", image);
-        try {
-            const response = await axios.put(`http://192.168.11.104:5000/api/consultation/upload-image/${consult_id}`,
-                formData
-            )
-            if (response.status === 200) {
-                console.log("le diagnostic : ", response.data)
-                handlerDiagnostic(consult_id)
-                fetchConsultationsRdv(rdv_id, updateConsultations);
-            }
-        }
-        catch (err) {
-            console.log("Echec de l'enregistrement de l'image")
-        }
-    }
 
     ////////////////////// soumission formulaire ////////////////////
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        setSuccessMessage("please wait for the disease detection")
-        const currentDateTime = new Date();
-        setdateConsult(currentDateTime);
-        console.log(currentDateTime)
-
         try {
-            if (consultationToUpdate) {
-                try {
-                    const response = await axios.put(
-                        `http://192.168.11.104:5000/api/consultation/update/${consultationToUpdate._id}`,
-                        {
-                            description,
-                            "prescription":prescriptions
-                        }
-                    );
+            const response = await axios.put(
+                `${path}/api/consultation/update/${consultationToUpdate._id}/${medecin._id}`
+            );
 
-                    if (response.status === 201) {
-                        const consultation = response.data;
-                        console.log("update consultation done :", consultation);
-                        setErrorMessage("");
-                        fetchConsultationsRdv(rdv_id, updateConsultations);
-                        setModalIsOpen(false);
-                    }
-                } catch (error) {
-                    console.error("Erreur lors de l'enregistrement du rendez vous", error);
-                    setErrorMessage("Error during updating. Please try again.");
-                    setSuccessMessage("");
-
-                }
-
-            } else {
-                try {
-                    const response = await axios.post(
-                        `http://192.168.11.104:5000/api/consultations/create/${rdv_id}`,
-                        {
-                            dateConsult,
-                            "descripSymptome": symptomes
-                        }
-                    );
-
-                    if (response.status === 200) {
-                        const consultation = response.data;
-                        if (image) {
-                            createImage(consultation._id, image);
-                        }
-                        console.log("Nouveau consultation enregistré :", consultation);
-                        // setSuccessMessage("Registration successful!");
-                        setErrorMessage("");
-                    }
-                } catch (error) {
-                    console.error("Erreur lors de l'enregistrement de la consultation", error);
-                    setErrorMessage("Error during registration. Please try again.");
-                    setSuccessMessage("");
-
-                }
+            if (response.status === 201) {
+                const consultation = response.data;
+                console.log("update consultation done :", consultation);
+                setErrorMessage("");
+                fetchConsultationsRdv(path,consultationToUpdate.rdv._id, updateConsultations);
+                setModalIsOpen(false);
             }
         } catch (error) {
+            console.error("Erreur lors de l'enregistrement du rendez vous", error);
+            setErrorMessage("Error during updating. Please try again.");
+            setSuccessMessage("");
 
         }
-    };
 
-    const handleSelectChange = (descripSymptome) => {
-        const selectedValues = descripSymptome.map((item) => item.label);
-        setSyptomes(selectedValues);
-        setDescripSymptome(descripSymptome);
-        console.log(descripSymptome)
-    };
+    }
 
-    const handleInputChange = (e) => {
-        const { name, value, type, files } = e.target;
+    useEffect(() => {
+        const fetchDoctors = async () => {
+            const listDoctor = [];
+            for (let medecin of medecins) {
+                listDoctor.push({ value: `${medecin.tel}`, label: `${medecin.nom} ${medecin.prenom}` })
+            }
+            await setDoctors(listDoctor);
+        };
+        fetchDoctors();
+    }, [medecins]);
 
-        switch (name) {
-            case "dateConsult":
-                setdateConsult(value);
-                break;
-            case "prescription":
-                const prescriptionArray = value.split(",");
-                setPrescriptions(prescriptionArray);
-                setPrescription(value)
-                break;
-            case "descripSymptome":
-                setDescripSymptome(value);
-                break;
-            case "description":
-                setDescription(value);
-                break;
-            case "image":
-                if (type === "file" && files && files.length > 0) {
-                    setImage(files[0]);
-                }
-                break;
-            default:
-                break;
+    const handleSelectChange = (item) => {
+        for (let doc of medecins) {
+            if (doc.tel == item.value) {
+                setMedecin(doctors[doc.tel])
+            }
         }
     };
 
@@ -174,68 +82,28 @@ function Form_consultation({ open, rdv_id, consultationToUpdate }) {
         <Modal show={modalIsOpen} onHide={handleCloseModal} size="lg">
             <form onSubmit={handleSubmit}>
                 <Modal.Header closeButton>
-                    <Modal.Title>CONSULTATION FORM</Modal.Title>
+                    <Modal.Title>SUBSTITUTE DOCTOR </Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body style={{justifyContent:'center', textAlign:'center'}}>
                     {successMessage && <p className="success-message">{successMessage}</p>}
                     {errorMessage && <p className="error-message">{errorMessage}</p>}
-                    {consultationToUpdate && <>
-                        <div className="form-field">
-                            <label>DISEASE DESCRIPTION</label>
-                            <input
-                                type="text"
-                                name="description"
-                                value={description}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                        <div className="form-field">
-                            <label>REQUIREMENT</label>
-                            <textarea
-                                type="text"
-                                name="prescription"
-                                value={prescription}
-                                onChange={handleInputChange}
-                                with={150}
-                            />
-                        </div>
-                    </>}
-                    {!consultationToUpdate &&
-                        <div className="form-field">
-                            <h4>Choose symptoms : </h4>
-                            <Select
-                                options={symptoms}
-                                value={descripSymptome}
-                                onChange={handleSelectChange}
-                                isMulti
-                                isSearchable
-                                placeholder="Select symptoms..."
-                            />
-                            <ul>
-                                {descripSymptome && descripSymptome.map((option) => (
-                                    <li key={option.value}>{option.label}</li>
-                                ))}
-                            </ul>
-                        </div>}
-
-                    {!consultationToUpdate && <div className="form-field">
-                        <label>IMAGE</label>
-                        <input
-                            type="file"
-                            name="image"
-                            accept="image/*"
-                            onChange={handleInputChange}
-                            required
+                    <div className="form-field">
+                        <h4>Choose Doctor : </h4>
+                        <Select
+                            options={doctors}
+                            value={medecin}
+                            onChange={(item) => handleSelectChange(item)}
+                            isSearchable
+                            placeholder="Select a doctor..."
                         />
-                    </div>}
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Close
                     </Button>
                     <Button id="sub_btn" type="submit">
-                        {bouton}
+                        Confirm
                     </Button>
                 </Modal.Footer>
             </form>

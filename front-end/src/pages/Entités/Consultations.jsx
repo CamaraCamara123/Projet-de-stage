@@ -7,11 +7,15 @@ import { useUserData } from '../../contexts/UserDataContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrashAlt, faClipboardUser, faSuitcaseMedical, faLungsVirus } from '@fortawesome/free-solid-svg-icons';
 import { fetchConsultation } from '../../components/fetchElement/fetchConsultations';
-import Form_consultation from '../../components/form/form_consult';
+// import Form_consultation from '../../components/form/form_consult';
 import Form__delete_consultation from '../../components/form/form_delete_consult';
-import Form_detail_consultation from '../../components/form/form_chart_consultaton';
-import Form_valide_diagnostic from '../../components/form/form_valide_diagnostic';
+// import Form_detail_consultation from '../../components/form/form_chart_diagnostic';
+// import Form_valide_diagnostic from '../../components/form/form_valide_diagnostic';
 import Transition from '../../constants/transition';
+import { Navigate } from 'react-router-dom';
+import { fetchConsultationDiagnostic } from '../../components/fetchElement/fetchDiagnostic';
+import './style.css';
+import { Table } from 'react-bootstrap';
 
 function Consultations() {
   const { consultations } = useUserData();
@@ -24,8 +28,8 @@ function Consultations() {
   const [modalIsOpen3, setModalIsOpen3] = useState(false);
   const [modalIsOpen4, setModalIsOpen4] = useState(false);
   const [modalIsOpen5, setModalIsOpen5] = useState(false);
-  const { consultation, updateConsultation } = useUserData();
-  const [details, setDetails] = useState([])
+  const { consultation, updateConsultation, updateDiagnostics, userData, path } = useUserData();
+
 
   useEffect(() => {
     setPagination(calculateRange(consultations, 5));
@@ -54,37 +58,30 @@ function Consultations() {
   };
 
 
-  const fupdate = (consultation_id) => {
-    fetchConsultation(consultation_id, updateConsultation);
-    if (consultation && consultation_id == consultation._id) {
-      modalIsOpen2 ? setModalIsOpen2(false) : setModalIsOpen2(true);
-    }
+  // const fupdate = (consultation_id) => {
+  //   fetchConsultation(consultation_id, updateConsultation);
+  //   if (consultation && consultation_id == consultation._id) {
+  //     modalIsOpen2 ? setModalIsOpen2(false) : setModalIsOpen2(true);
+  //   }
 
-  }
+  // }
 
   const fdelete = (consultation_id) => {
-    fetchConsultation(consultation_id, updateConsultation);
+    fetchConsultation(path,consultation_id, updateConsultation);
+    if (consultation && consultation_id == consultation._id) {
+      if(userData.role.includes('secretaire')&&consultation.diagnostics.length !=0){
+        alert("Impossible to delete this visit, it contains diagnostics")
+        return;
+      }
     modalIsOpen3 ? setModalIsOpen3(false) : setModalIsOpen3(true);
   }
-
-  const fdetails = (consultation_id) => {
-    fetchConsultation(consultation_id, updateConsultation);
-    const tabDetails = [];
-    if (consultation && consultation._id == consultation_id) {
-      for (let i = 0; i < consultation.maladies.length; i++) {
-        const newDetail = { label: consultation.maladies[i].nom, y: parseFloat(consultation.probabilities[i]) }
-        tabDetails.push(newDetail)
-      }
-      setDetails(tabDetails)
-      console.log(tabDetails)
-      modalIsOpen4 ? setModalIsOpen4(false) : setModalIsOpen4(true);
-    }
   }
 
-  const fvalider = (consultation_id) => {
-    fetchConsultation(consultation_id, updateConsultation);
+  const fdiagnostics = (consultation_id) => {
+    fetchConsultation(path,consultation_id, updateConsultation);
+    fetchConsultationDiagnostic(path,consultation_id, updateDiagnostics)
     if (consultation && consultation._id == consultation_id) {
-      modalIsOpen5 ? setModalIsOpen5(false) : setModalIsOpen5(true);
+      modalIsOpen4 ? setModalIsOpen4(false) : setModalIsOpen4(true);
     }
   }
 
@@ -121,22 +118,27 @@ function Consultations() {
             </div>
           </div>
 
-          <table>
+          <Table responsive striped bordered>
             <thead>
-              <th>PATIENT NUMBER</th>
+              <th>PATIENT</th>
+              <th>PATIENT TEL</th>
+              <th>DOCTOR</th>
               <th>DATE</th>
               <th>HOUR</th>
-              <th>DISEASE</th>
-              <th>PROBABILITY</th>
               <th>ACTIONS</th>
             </thead>
-
             {filteredConsultations.length !== 0 ? (
               <tbody>
                 {filteredConsultations.map((consultation, index) => (
                   <tr key={index}>
                     <td>
+                      <span>{consultation.rdv.patient.nom} {consultation.rdv.patient.prenom}</span>
+                    </td>
+                    <td>
                       <span>{consultation.rdv.patient.tel}</span>
+                    </td>
+                    <td>
+                      <span>{consultation.rdv.medecin.nom} {consultation.rdv.medecin.prenom}</span>
                     </td>
                     <td>
                       <span>{new Date(consultation.dateConsult).toISOString().split('T')[0]}</span>
@@ -148,38 +150,27 @@ function Consultations() {
 
                     </td>
                     <td>
-                      <span>{consultation.maladie ? consultation.maladie.nom : "Nothing"}</span>
-                    </td>
-                    <td>
-                      <span>{consultation.probability ? `${consultation.probability}%` : "Nothing"}</span>
-                    </td>
-                    <td>
-                      <span>
-                        <button className='btn btn-primary' title='edit' onClick={() => fupdate(consultation._id)}>
+                      {/* <span>
+                        <button className='elt-btn btn btn-primary' title='edit' onClick={() => fupdate(consultation._id)}>
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
-                      </span>
+                      </span> */}
                       <span>
-                        <button className='btn btn-danger display-flex' title='deletion' onClick={() => fdelete(consultation._id)}>
+                        <button className='elt-btn btn btn-danger display-flex' title='deletion' onClick={() => fdelete(consultation._id)}>
                           <FontAwesomeIcon icon={faTrashAlt} />
                         </button>
                       </span>
-                      <span>
-                        <button className='btn btn-dark' title='details of the consultation' onClick={() => fdetails(consultation._id)}>
+                      {userData.role.includes('medecin') &&!userData.role.includes('admin')&& <span>
+                        <button className='elt-btn btn btn-dark' title='diagnostics' onClick={() => fdiagnostics(consultation._id)}>
                           <FontAwesomeIcon icon={faClipboardUser} />
                         </button>
-                      </span>
-                      <span>
-                        <button className='btn btn-success' title='valider diagnostic' onClick={() => fvalider(consultation._id)}>
-                          <FontAwesomeIcon icon={faLungsVirus} />
-                        </button>
-                      </span>
+                      </span>}
                     </td>
                   </tr>
                 ))}
               </tbody>
             ) : null}
-          </table>
+          </Table>
 
           {filteredConsultations.length !== 0 ? (
             <div className='dashboard-content-footer'>
@@ -199,10 +190,10 @@ function Consultations() {
           )}
         </div>
         {/* {modalIsOpen && <Form_consultation open={modalIsOpen} />}*/}
-        {modalIsOpen2 && <Form_consultation open={modalIsOpen2} rdv_id={consultation.rdv._id} consultationToUpdate={consultation} />}
+        {/* {modalIsOpen2 && <Form_consultation open={modalIsOpen2} consultationToUpdate={consultation} />} */}
         {modalIsOpen3 && <Form__delete_consultation open={modalIsOpen3} consultationToDelete={consultation} />}
-        {modalIsOpen4 && <Form_detail_consultation open={modalIsOpen4} details={details} consultation={consultation} />}
-        {modalIsOpen5 && <Form_valide_diagnostic open={modalIsOpen5} consult={consultation} />}
+        {modalIsOpen4 && <Navigate to='/dashboard/diagnostics' />}
+        {/* {modalIsOpen5 && <Form_valide_diagnostic open={modalIsOpen5} consult={consultation} />} */}
       </div>
     </Transition>
   );
