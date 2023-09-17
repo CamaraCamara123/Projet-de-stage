@@ -20,7 +20,7 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
     const [genre, setGenre] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const {updateSecretaires, path }= useUserData()
+    const { updateSecretaires, path } = useUserData()
     const [msgError, setMsgError] = useState("")
     const [bouton, setBouton] = useState("save")
 
@@ -48,7 +48,8 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
         try {
             const formData = new FormData();
             formData.append("image", photo);
-
+            const token = localStorage.getItem('token');
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             const response2 = await axios.put(
                 `${path}/api/users/user/upload-image/${username}`,
                 formData
@@ -94,7 +95,7 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
                     if (response.status === 200) {
                         setSuccessMessage("Updated successful!");
                         setErrorMessage("");
-                        fetchSecretaires(path,updateSecretaires);
+                        fetchSecretaires(path, updateSecretaires);
                         if (photo) {
                             handlePhoto(photo, username);
                         }
@@ -109,6 +110,8 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
 
             } else {
                 try {
+                    const token = localStorage.getItem('token');
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                     const response = await axios.post(
                         `${path}/api/users/secretaire/create`,
                         {
@@ -126,7 +129,7 @@ function Form_Secretaire({ open, secretaireToUpdate }) {
                     if (response.status === 201) {
                         setSuccessMessage("Registration successful!");
                         setErrorMessage("");
-                        fetchSecretaires(path,updateSecretaires);
+                        fetchSecretaires(path, updateSecretaires);
                         if (photo) {
                             handlePhoto(photo, username);
                         }

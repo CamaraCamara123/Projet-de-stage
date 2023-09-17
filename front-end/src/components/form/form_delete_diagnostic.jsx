@@ -4,7 +4,7 @@ import axios from "axios"; // Import Axios
 import "./form.css";
 import { useUserData } from "../../contexts/UserDataContext";
 import { fetchConsultationDiagnostic } from "../fetchElement/fetchDiagnostic";
-
+import { useNavigate } from 'react-router-dom';
 
 
 function Form__delete_diagnostic({ open, diagnosticToDelete }) {
@@ -12,6 +12,7 @@ function Form__delete_diagnostic({ open, diagnosticToDelete }) {
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const { updateDiagnostics, path } = useUserData()
+    const navigate = useNavigate();
 
 
 
@@ -33,6 +34,7 @@ function Form__delete_diagnostic({ open, diagnosticToDelete }) {
             console.error("Error deleting diagnostic", error);
             setErrorMessage("Error deleting rendez-vous. Please try again.");
             setSuccessMessage("");
+            navigate('/login')
         }
     };
 

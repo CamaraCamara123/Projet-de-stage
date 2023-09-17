@@ -185,30 +185,6 @@ td span {
 
 }
 
-.btn-home {
-    color: white;
-    background-color: lightskyblue;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 -2px 4px rgba(0, 0.3, 0, 0.2);
-    border-radius: 10%;
-    width: 80px;
-    outline: invert;
-
-
-}
-
-.btn-home:hover {
-    background-color: lightgreen;
-    font-family: 'Times New Roman', Times, serif;
-    font-weight: bolder;
-    overflow: inherit;
-    outline-color: #FFFFFF;
-    width: 90px;
-    height: 50px;
-}
-
-
-
 .home-title {
     color: cornflowerblue;
     font-size: xx-large;

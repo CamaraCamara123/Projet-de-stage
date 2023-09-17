@@ -16,6 +16,7 @@ import Profile from '../profiles/Profile';
 import Transition from '../../constants/transition';
 import { Table } from 'react-bootstrap';
 import './style.css'
+import { useNavigate } from 'react-router-dom';
 
 function Secretaires() {
   const { secretaires, userData } = useUserData();
@@ -28,6 +29,7 @@ function Secretaires() {
   const [modalIsOpen3, setModalIsOpen3] = useState(false);
   const [modalIsOpen4, setModalIsOpen4] = useState(false);
   const { secretaire, updatePatient, updateMedecin, updateSecretaire, path } = useUserData();
+  const navigate = useNavigate();
 
   updateMedecin(null);
   updatePatient(null);
@@ -76,6 +78,7 @@ function Secretaires() {
       console.log(response.data)
     } catch (error) {
       console.error('Erreur lors de la récupération des données du secretaire :', error);
+      navigate('/login')
     }
   };
 

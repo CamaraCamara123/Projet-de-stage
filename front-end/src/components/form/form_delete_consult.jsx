@@ -5,6 +5,7 @@ import "./form.css";
 import { Link, Navigate } from "react-router-dom";
 import { useUserData } from "../../contexts/UserDataContext";
 import { fetchConsultations, fetchConsultationsRdv } from "../fetchElement/fetchConsultations";
+import { useNavigate } from 'react-router-dom';
 
 
 function Form__delete_consultation({ open, consultationToDelete }) {
@@ -12,11 +13,8 @@ function Form__delete_consultation({ open, consultationToDelete }) {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const { updateConsultations, path } = useUserData()
+  const navigate = useNavigate();
 
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-  };
 
   const onDelete = () => {
     setModalIsOpen(false);
@@ -40,6 +38,7 @@ function Form__delete_consultation({ open, consultationToDelete }) {
       console.error("Error deleting consultation", error);
       setErrorMessage("Error deleting rendez-vous. Please try again.");
       setSuccessMessage("");
+      navigate('/login')
     }
   };
 

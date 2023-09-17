@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import "./form.css";
 import { useEffect } from 'react';
 
+
 export default function Form_maladie({ open, maladieToUpdate }) {
   const [maladie, setMaladie] = useState('');
   const [nombreStades, setNombreStades] = useState(0);
@@ -17,6 +18,7 @@ export default function Form_maladie({ open, maladieToUpdate }) {
   const [successMessage, setSuccessMessage] = useState("");
   const [ok, setOk] = useState(true)
   const [fullName, setFullName] = useState("")
+  const navigate = useNavigate();
 
 
 
@@ -150,6 +152,7 @@ export default function Form_maladie({ open, maladieToUpdate }) {
     }
     catch (err) {
       console.log("Echec de l'enregistrement de la maladie")
+      navigate('/login')
     }
   }
 
@@ -176,6 +179,7 @@ export default function Form_maladie({ open, maladieToUpdate }) {
     }
     catch (err) {
       console.log("Echec de l'enregistrement de la maladie")
+      navigate('/login')
     }
   }
 

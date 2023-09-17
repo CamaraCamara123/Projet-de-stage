@@ -50,7 +50,8 @@ function Form({ open, patientToUpdate }) {
     try {
       const formData = new FormData();
       formData.append("image", photo);
-
+      const token = localStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       const response2 = await axios.put(
         `${path}/api/users/user/upload-image/${username}`,
         formData
@@ -80,6 +81,8 @@ function Form({ open, patientToUpdate }) {
       if (patientToUpdate) {
         console.log(birthdate)
         try {
+          const token = localStorage.getItem('token');
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           const response = await axios.put(
             `${path}/api/users/patient/update/${patientToUpdate._id}`,
             {

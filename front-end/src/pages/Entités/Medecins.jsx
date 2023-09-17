@@ -19,6 +19,7 @@ import Profile from '../profiles/Profile';
 import { fetchMedecin } from '../../components/fetchElement/fetchMedecins';
 import { fetchMedecinRdvs } from '../../components/fetchElement/fetchRdvs';
 import Transition from '../../constants/transition';
+import { Table } from 'react-bootstrap';
 
 function Medecins() {
   const { medecins, updateRdvs } = useUserData();
@@ -135,7 +136,7 @@ function Medecins() {
           </div>
         </div>
 
-        <table>
+        <Table striped bordered responsive>
           <thead>
             <th>FIRST NAME</th>
             <th>LAST NAME</th>
@@ -220,7 +221,7 @@ function Medecins() {
               ))}
             </tbody>
           ) : null}
-        </table>
+        </Table>
 
         {filteredMedecins.length !== 0 ? (
           <div className='dashboard-content-footer'>

@@ -4,12 +4,14 @@ import axios from "axios"; // Import Axios
 import "./form.css";
 import { fetchMedecinRdvs, fetchPatientRdvs, fetchRdvs } from "../fetchElement/fetchRdvs";
 import { useUserData } from "../../contexts/UserDataContext";
+import { useNavigate } from 'react-router-dom';
 
 function Form__delete_rdv({ open, rdvToDelete }) {
   const [modalIsOpen, setModalIsOpen] = useState(open);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const { updateRdvs, medecin, patient, path } = useUserData()
+  const navigate = useNavigate();
 
 
   const onDelete = () => {
@@ -41,6 +43,7 @@ function Form__delete_rdv({ open, rdvToDelete }) {
       console.error("Error deleting rendez-vous", error);
       setErrorMessage("Error deleting rendez-vous. Please try again.");
       setSuccessMessage("");
+      navigate('/login')
     }
   };
 

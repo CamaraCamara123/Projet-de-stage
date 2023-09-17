@@ -28,6 +28,8 @@ function Form_valide_diagnostic({ open, diagnostic }) {
         e.preventDefault();
 
         try {
+            const token = localStorage.getItem('token');
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             const response = await axios.put(
                 `${path}/api/diagnostic/validation/${diagnostic._id}/${maladie_id}`,
                 {
@@ -37,7 +39,7 @@ function Form_valide_diagnostic({ open, diagnostic }) {
 
             if (response.status === 200) {
                 console.log("Diagnostic validated successfully :");
-                fetchConsultationDiagnostic(path,diagnostic.consultation._id, updateDiagnostics);
+                fetchConsultationDiagnostic(path, diagnostic.consultation._id, updateDiagnostics);
                 setSuccessMessage("wait please ......");
                 setErrorMessage("");
                 setModalIsOpen(false);
@@ -75,15 +77,15 @@ function Form_valide_diagnostic({ open, diagnostic }) {
                 <Modal.Body style={{ width: '100%' }}>
                     {successMessage && <p className="success-message">{successMessage}</p>}
                     {errorMessage && <p className="error-message">{errorMessage}</p>}
-                    <Container className='chat-container' style={{alignContent:"stretch"}}>
+                    <Container className='chat-container' style={{ alignContent: "stretch" }}>
                         <Row>
                             <Col>
                                 <div className="form-field">
                                     <label>SELECT THE CORRECT DISEASE</label>
-                                    <select name="maladie_id" value={maladie_id} onChange={handleInputChange} 
-                                    style={{width:"200px", justifyContent:'initial',fontSize:'20px',color:'gray'}} required>
+                                    <select name="maladie_id" value={maladie_id} onChange={handleInputChange}
+                                        style={{ width: "200px", justifyContent: 'initial', fontSize: '20px', color: 'gray' }} required>
                                         <option value="">choose</option>
-                                        {diagnostic.maladies.map((maladie,index) => (
+                                        {diagnostic.maladies.map((maladie, index) => (
                                             <option key={maladie._id} value={maladie._id}>
                                                 <span>{maladie.nom}</span> ========= <span>{diagnostic.probabilities[index]}%</span>
                                             </option>

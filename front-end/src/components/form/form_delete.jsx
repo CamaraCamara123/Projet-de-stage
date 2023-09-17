@@ -7,12 +7,14 @@ import fetchPatients from "../fetchElement/fetchPatients";
 import { fetchMedecins } from "../fetchElement/fetchMedecins";
 import fetchSecretaires from "../fetchElement/fetchSecretaires";
 import { useUserData } from "../../contexts/UserDataContext";
+import { useNavigate } from 'react-router-dom';
 
 function Form_confirm_delete({ open, userToDelete }) {
   const [modalIsOpen, setModalIsOpen] = useState(open);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const { updatePatients, UpdateMedecins, updateSecretaires, path } = useUserData();
+  const navigate = useNavigate();
 
   const onDelete = () => {
     setModalIsOpen(false);
@@ -41,6 +43,7 @@ function Form_confirm_delete({ open, userToDelete }) {
         console.error("Error deleting user", error);
         setErrorMessage(error.response.data.message);
         setSuccessMessage("");
+        navigate('/login')
       }
     } else if (
       userToDelete.role.includes("medecin") &&
@@ -63,6 +66,7 @@ function Form_confirm_delete({ open, userToDelete }) {
         console.error("Error deleting dermatologue", error);
         setErrorMessage(error.response.data.message);
         setSuccessMessage("");
+        navigate('/login')
       }
     } else if (
       userToDelete.role.includes("secretaire") &&
@@ -85,6 +89,7 @@ function Form_confirm_delete({ open, userToDelete }) {
         console.error("Error deleting secretaire", error);
         setErrorMessage(error.response.data.message);
         setSuccessMessage("");
+        navigate('/login')
       }
     }
   };

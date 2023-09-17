@@ -5,12 +5,14 @@ import "./form.css";
 import { Link, Navigate } from "react-router-dom";
 import { useUserData } from "../../contexts/UserDataContext";
 import { fetchMaladies } from "../fetchElement/fetchMaladies";
+import { useNavigate } from 'react-router-dom';
 
 function Form_delete_maladie({ open, maladieToDelete }) {
     const [modalIsOpen, setModalIsOpen] = useState(open);
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const { updateMaladies, path } = useUserData()
+    const navigate = useNavigate();
 
 
     const onDelete = () => {
@@ -35,6 +37,7 @@ function Form_delete_maladie({ open, maladieToDelete }) {
             console.error("Error deleting rendez-vous", error);
             setErrorMessage("Error deleting rendez-vous. Please try again.");
             setSuccessMessage("");
+            navigate('/login');
         }
     };
 

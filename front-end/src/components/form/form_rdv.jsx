@@ -58,6 +58,8 @@ function Form_rdv() {
         try {
             if (rdv) {
                 try {
+                    const token = localStorage.getItem('token');
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                     const response = await axios.put(
                         `${path}/api/rendez_vous/update/${rdv._id}`,
                         {
@@ -70,13 +72,13 @@ function Form_rdv() {
                     if (response.status === 200) {
                         const rdv = response.data;
                         if (userData.role.includes('secretaire') && !userData.role.includes('admin')) {
-                            fetchPatientRdvs(path,userData._id, updateRdvs)
+                            fetchPatientRdvs(path, userData._id, updateRdvs)
                         }
                         else if (userData.role.includes('medecin') && !userData.role.includes('admin')) {
-                            fetchMedecinRdvs(path,userData._id, updateRdvs)
+                            fetchMedecinRdvs(path, userData._id, updateRdvs)
                         }
                         else {
-                            fetchRdvs(path,updateRdvs)
+                            fetchRdvs(path, updateRdvs)
                         }
                         console.log("update rdv done :", rdv);
                         setSuccessMessage("Updated successful!");
@@ -91,6 +93,8 @@ function Form_rdv() {
 
             } else {
                 try {
+                    const token = localStorage.getItem('token');
+                    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                     const response = await axios.post(
                         `${path}/api/rendez_vous/${patient._id}/${doctorSelected._id}`,
                         {
@@ -102,13 +106,13 @@ function Form_rdv() {
                     if (response.status === 200) {
                         const rdv = response.data;
                         if (userData.role.includes('secretaire') && !userData.role.includes('admin')) {
-                            fetchPatientRdvs(path,userData._id, updateRdvs)
+                            fetchPatientRdvs(path, userData._id, updateRdvs)
                         }
                         else if (userData.role.includes('medecin') && !userData.role.includes('admin')) {
-                            fetchMedecinRdvs(path,userData._id, updateRdvs)
+                            fetchMedecinRdvs(path, userData._id, updateRdvs)
                         }
                         else {
-                            fetchRdvs(path,updateRdvs)
+                            fetchRdvs(path, updateRdvs)
                         }
                         console.log("Nouveau rdv enregistré :", rdv);
                         setSuccessMessage("Registration successful!");
@@ -155,12 +159,12 @@ function Form_rdv() {
 
 
 
-    const handleCellClick = async (event,args) => {
+    const handleCellClick = async (event, args) => {
         event.preventDefault();
-        const today = new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()).getTime();
-        const ChooseDate = new Date(new Date(args).getFullYear(),new Date(args).getMonth(args),new Date(args).getDate()).getTime();
-        console.log("times 1 : ",today," times 2 : ", ChooseDate)
-        if(ChooseDate<today){
+        const today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()).getTime();
+        const ChooseDate = new Date(new Date(args).getFullYear(), new Date(args).getMonth(args), new Date(args).getDate()).getTime();
+        console.log("times 1 : ", today, " times 2 : ", ChooseDate)
+        if (ChooseDate < today) {
             alert("Please choose a valid date");
             return;
         }
@@ -185,15 +189,15 @@ function Form_rdv() {
         const monthNames = [
             "January",
             "February",
-            "March", 
-            "April", 
-            "May", 
-            "June", 
-            "July", 
-            "August", 
-            "September", 
-            "October", 
-            "November", 
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
             "December"
         ];
 
@@ -218,7 +222,7 @@ function Form_rdv() {
                 <h2 className="day-title">Days of the Month ({monthNames[new Date().getMonth()]})</h2>
                 <div className="button-group">
                     {daysOfMonth.map((day) => (
-                        <button key={day} className="day-button" onClick={(event) => handleCellClick(event,day)}>
+                        <button key={day} className="day-button" onClick={(event) => handleCellClick(event, day)}>
                             {format(day, "dd")}
                         </button>
                     ))}

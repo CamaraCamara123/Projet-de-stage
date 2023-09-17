@@ -20,6 +20,7 @@ import Transition from '../../constants/transition';
 import Form_rdv from '../../components/form/form_rdv';
 import { fetchPatientMedecinVisite, fetchPatientVisite } from '../../components/fetchElement/fetchConsultations';
 import { Table } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 function Patients() {
   const { patients } = useUserData();
@@ -50,6 +51,7 @@ function Patients() {
     updateConsultations,
     path
    } = useUserData();
+   const navigate = useNavigate();
 
   updateMedecin(null);
   // updatePatient(null);
@@ -179,6 +181,7 @@ function Patients() {
       updatePatient(response.data);
     } catch (error) {
       console.error('Erreur lors de la récupération des données du patient :', error);
+      navigate('/login')
     }
   };
 

@@ -23,8 +23,7 @@ export const fetchMedecin = async (path,user_id,updateMedecin) => {
     try {
       const response = await axios.get(`${path}/api/users/user/${user_id}`, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization':`Bearer ${token}`
+          'Content-Type': 'application/json'
         }
       });
       updateMedecin(response.data);

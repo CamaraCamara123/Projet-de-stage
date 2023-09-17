@@ -8,6 +8,7 @@ import { useUserData } from "../../contexts/UserDataContext";
 import symptoms from "../../constants/list_symptoms";
 import Select from "react-select";
 import { fetchConsultationDiagnostic } from "../fetchElement/fetchDiagnostic";
+import { useNavigate } from 'react-router-dom';
 
 
 function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
@@ -23,6 +24,7 @@ function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
     const { updateDiagnostics, path } = useUserData()
     const [bouton, setBouton] = useState("save")
     const [symptomes, setSyptomes] = useState([])
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -100,6 +102,7 @@ function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
                     console.error("Erreur lors de l'enregistrement du diagnostic", error);
                     setErrorMessage("Error during updating. Please try again.");
                     setSuccessMessage("");
+                    navigate('/login')
 
                 }
 
@@ -129,7 +132,7 @@ function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
                     console.error("Erreur lors de l'enregistrement de la diagnostic", error);
                     setErrorMessage("Error during registration. Please try again.");
                     setSuccessMessage("");
-
+                    navigate('/login')
                 }
             }
         } catch (error) {

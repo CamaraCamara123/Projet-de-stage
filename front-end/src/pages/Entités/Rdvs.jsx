@@ -83,8 +83,8 @@ function Rdvs() {
   }
 
   useEffect(() => {
-    setPagination(calculateRange(rdvs, 5));
-    setFilteredRdvs(sliceData(rdvs, page, 5));
+    setPagination(calculateRange((search=='')?rdvs:FilteredRdvs, 5));
+    setFilteredRdvs(sliceData((search=='')?rdvs:FilteredRdvs, page, 5));
   }, [rdvs]);
 
   // Search
@@ -111,7 +111,7 @@ function Rdvs() {
   // Change Page
   const __handleChangePage = (new_page) => {
     setPage(new_page);
-    setFilteredRdvs(sliceData(rdvs, new_page, 5));
+    setFilteredRdvs(sliceData((search=='')?rdvs:FilteredRdvs, new_page, 5));
   };
 
   const fupdate = (rdv_id) => {
