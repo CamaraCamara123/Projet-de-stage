@@ -26,7 +26,7 @@ const Details_diagnostic = () => {
             {consultation.rdv.patient.nom}'s diagnostics
           </Text>
         </View>
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView nestedScrollEnabled={true} contentContainerStyle={styles.container}>
           <DataTable style={styles.table}>
             <DataTable.Header>
               <DataTable.Title>Statistic table</DataTable.Title>
@@ -69,6 +69,7 @@ const Details_diagnostic = () => {
 
                 <FlatList
                   data={diagnostic.descripSymptome}
+                  keyExtractor={(item, index) => `key-${index}`}
                   renderItem={({ item, index }) => <ListItem item={item} index={index} />}
                 />
               </Card.Content>

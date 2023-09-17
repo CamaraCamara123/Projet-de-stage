@@ -41,12 +41,12 @@ const New_Diagnostic = () => {
     const cameraRef = useRef(null);
 
     ///////////////////////////// lancer le diagnostic///////////////
-    const handlerDiagnostic = async (diagnostic,id) => {
+    const handlerDiagnostic = async (diagnostic, id) => {
         try {
             const response = await axios.put(`${path}/api/consult/diagnostic/${diagnostic._id}`);
             if (response.status == 200) {
                 console.log('treatment done successfully !!!!');
-                await fetchConsultationDiagnostic(path,id, updateDiagnostics);
+                await fetchConsultationDiagnostic(path, id, updateDiagnostics);
                 await navigation.navigate("diagnostics");
             }
         } catch (error) {
@@ -71,7 +71,7 @@ const New_Diagnostic = () => {
             }
             )
             if (response.status === 200) {
-                handlerDiagnostic(diagnostic,response.data.consultation._id)
+                handlerDiagnostic(diagnostic, response.data.consultation._id)
             }
         }
         catch (err) {

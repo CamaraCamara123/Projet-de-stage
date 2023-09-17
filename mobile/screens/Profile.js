@@ -20,7 +20,7 @@ const thumbMeasure = (width - 48 - 32) / 3;
 
 const Profile =()=> {
 
-  const {userData,path} = useUserData()
+  const {userData,path, consultations, patients} = useUserData()
     return (
       <Block flex style={styles.profile}>
         <Block flex>
@@ -68,9 +68,9 @@ const Profile =()=> {
                         color="#525F7F"
                         style={{ marginBottom: 4 }}
                       >
-                        2K
+                        {consultations.length}
                       </Text>
-                      <Text size={12} color={argonTheme.COLORS.TEXT}>Orders</Text>
+                      <Text size={12} color={argonTheme.COLORS.TEXT}>Today visits</Text>
                     </Block>
                     <Block middle>
                       <Text
@@ -79,11 +79,11 @@ const Profile =()=> {
                         size={18}
                         style={{ marginBottom: 4 }}
                       >
-                        10
+                        {patients.length}
                       </Text>
-                      <Text size={12} color={argonTheme.COLORS.TEXT}>Photos</Text>
+                      <Text size={12} color={argonTheme.COLORS.TEXT}>Patients treated</Text>
                     </Block>
-                    <Block middle>
+                    {/* <Block middle>
                       <Text
                         bold
                         color="#525F7F"
@@ -93,7 +93,7 @@ const Profile =()=> {
                         89
                       </Text>
                       <Text size={12} color={argonTheme.COLORS.TEXT}>Comments</Text>
-                    </Block>
+                    </Block> */}
                   </Block>
                 </Block>
                 <Block flex>
@@ -102,7 +102,7 @@ const Profile =()=> {
                       
                     </Text>
                     <Text size={16} color="#32325D" style={{ marginTop: 10 }}>
-                      San Francisco, USA
+                      {userData.nom} {userData.prenom}
                     </Text>
                   </Block>
                   <Block middle style={{ marginTop: 30, marginBottom: 16 }}>
@@ -114,8 +114,7 @@ const Profile =()=> {
                       color="#525F7F"
                       style={{ textAlign: "center" }}
                     >
-                      An artist of considerable range, Jessica name taken by
-                      Melbourne …
+                      Doctor profile on dermato mobile App ...
                     </Text>
                     <Button
                       color="transparent"

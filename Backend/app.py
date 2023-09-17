@@ -1476,7 +1476,7 @@ def diagnostics_by_consultation(current_user,consult_id):
     ]
     return jsonify(diagnostic_data), 201
 
-################################################### supprimer consultation ######################################################
+################################################### supprimer diagnostic ######################################################
 @app.route("/api/diagnostic/delete/<string:diagnostic_id>", methods=["DELETE", "PUT"])
 @token_required
 def delete_diagnostic(current_user,diagnostic_id):

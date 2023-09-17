@@ -23,85 +23,6 @@ const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
-// function ElementsStack(props) {
-//   return (
-//     <Stack.Navigator
-//       screenOptions={{
-//         mode: "card",
-//         headerShown: false,
-//       }}
-//     >
-//       <Stack.Screen
-//         name="Elements"
-//         component={Elements}
-//         options={{
-//           header: ({ navigation, scene }) => (
-//             <Header title="Elements" navigation={navigation} scene={scene} />
-//           ),
-//           cardStyle: { backgroundColor: "#F8F9FE" },
-//         }}
-//       />
-//       {/* <Stack.Screen
-//         name="Pro"
-//         component={Pro}
-//         options={{
-//           header: ({ navigation, scene }) => (
-//             <Header
-//               title=""
-//               back
-//               white
-//               transparent
-//               navigation={navigation}
-//               scene={scene}
-//             />
-//           ),
-//           headerTransparent: true,
-//         }}
-//       /> */}
-//     </Stack.Navigator>
-//   );
-// }
-
-// function ArticlesStack(props) {
-  
-//   return (
-//     <Stack.Navigator
-//       screenOptions={{
-//         mode: "card",
-//         headerShown: "screen",
-//       }}
-//     >
-//       <Stack.Screen
-//         name="Articles"
-//         component={Articles}
-//         options={{
-//           header: ({ navigation, scene }) => (
-//             <Header title="Articles" navigation={navigation} scene={scene} />
-//           ),
-//           cardStyle: { backgroundColor: "#F8F9FE" },
-//         }}
-//       />
-//       <Stack.Screen
-//         name="Pro"
-//         component={Pro}
-//         options={{
-//           header: ({ navigation, scene }) => (
-//             <Header
-//               title=""
-//               back
-//               white
-//               transparent
-//               navigation={navigation}
-//               scene={scene}
-//             />
-//           ),
-//           headerTransparent: true,
-//         }}
-//       />
-//     </Stack.Navigator>
-//   );
-// }
-
 function ProfileStack(props) {
   return (
     <Stack.Navigator
@@ -128,23 +49,6 @@ function ProfileStack(props) {
           headerTransparent: true,
         }}
       />
-      {/* <Stack.Screen
-        name="Pro"
-        component={Pro}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              title=""
-              back
-              white
-              transparent
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          headerTransparent: true,
-        }}
-      /> */}
     </Stack.Navigator>
   );
 }
@@ -311,23 +215,9 @@ function AppStack(props) {
           headerShown: false,
         }}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Account"
         component={Register}
-        options={{
-          headerShown: false,
-        }}
-      />
-      {/* <Drawer.Screen
-        name="Elements"
-        component={ElementsStack}
-        options={{
-          headerShown: false,
-        }}
-      /> */}
-      {/* <Drawer.Screen
-        name="Articles"
-        component={ArticlesStack}
         options={{
           headerShown: false,
         }}

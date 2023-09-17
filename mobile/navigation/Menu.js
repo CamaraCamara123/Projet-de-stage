@@ -8,7 +8,7 @@ import { fetchMedecinDayConsultations } from "../components/fetchElement/fetchCo
 import { useUserData } from "../contexts/useUserData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { fetchMaladies } from "../components/fetchElement/fetchMaladies";
+import { fetchMedecinPatient } from "../components/fetchElement/fetchPatients";
 
 function CustomDrawerContent({
   drawerPosition,
@@ -20,7 +20,7 @@ function CustomDrawerContent({
 }) {
   const screens = ["Home", "Profile"];
   const { logout } = useAuth()
-  const { userData, updateConsultations, updateUserData, path, updateMaladies } = useUserData()
+  const { userData, updateConsultations, updateUserData, path, updatePatients } = useUserData()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -28,14 +28,12 @@ function CustomDrawerContent({
         const token = await AsyncStorage.getItem('token');
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-        const response = await axios.get(`${path}/api/users/current`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await axios.get(`${path}/api/users/current`);
 
         if (response.status === 200) {
           if (response.data.role.includes('medecin') && !response.data.role.includes('admin')) {
             fetchMedecinDayConsultations(path,response.data._id, updateConsultations);
-            fetchMaladies(path,updateMaladies);
+            fetchMedecinPatient(path,response.data._id,updatePatients)
             updateUserData(response.data);
           } else {
             logout();

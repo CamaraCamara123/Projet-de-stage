@@ -6,6 +6,7 @@ import axios from "axios";
 export const fetchConsultationDiagnostic = async (path,consult_id,updateDiagnostics) => {
     const token = await AsyncStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    console.log('')
     try {
       const response = await axios.get(`${path}/api/consultation/diagnostics/${consult_id}`, {
         headers: {
@@ -22,6 +23,7 @@ export const fetchConsultationDiagnostic = async (path,consult_id,updateDiagnost
   export const fetchDiagnostic = async (path,diagnostic_id,updateDiagnostic) => {
     const token = await AsyncStorage.getItem('token');
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    console.log('')
     try {
       const response = await axios.get(`${path}/api/diagnostic/${diagnostic_id}`, {
         headers: {
