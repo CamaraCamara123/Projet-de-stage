@@ -52,8 +52,8 @@ export const fetchConsultationsRdv = async (path, rdv_id, updateConsultation) =>
 
 //visites du jour du medecin
 export const fetchMedecinDayConsultations = async (path, medecin_id, updateConsultations) => {
-  const token = await AsyncStorage.getItem('token');
-  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  // const token = await AsyncStorage.getItem('token');
+  // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   console.log('token')
   try {
     const response = await axios.get(`${path}/api/visite/dermatologue/today/${medecin_id}`, {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,9 +8,34 @@ import { DataTable } from 'react-native-paper';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import { Block, Text } from "galio-framework";
 import { Card, Paragraph } from 'react-native-paper';
+import { useAuth } from '../contexts/useAuth';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
 const Details_diagnostic = () => {
 
   const { diagnostic, consultation, details, path } = useUserData();
+  const navigation = useNavigation();
+  const { logout } = useAuth()
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      try {
+        const response = await axios.get(`${path}/api/consultation/diagnostics/${consultation._id}`);
+        if (response.status == 201) {
+          console.log('ici');
+        }
+      } catch (error) {
+        logout();
+        navigation.navigate("Login");
+      }
+    };
+      fetchUserData();
+     
+  }, [consultation]);
 
   const ListItem = ({ item, index }) => (
     <View key={index} style={styles.listItem}>
@@ -137,7 +162,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     color: 'white',
     fontSize: 22,
-    fontWeight: 'bold'
+    fontWeight: '900'
   }
 });
 

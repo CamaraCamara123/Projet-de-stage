@@ -1,19 +1,18 @@
 .card-container-home {
     opacity: 0.8;
-    margin: 10px;
-    max-height: 40%;
+    /* margin: 5px; */
+    max-height: 50%;
     background-color: rgb(212, 237, 100) !important;
 }
 
 .home-card-body{
-    overflow-y: auto;
+    /* overflow-y: auto; */
     max-height: 200px;
     background-color: white;
 }
 
 .home-title-container{
-    margin: auto;
-    margin-top: 70px;
+    
 }
 
 .home-title{

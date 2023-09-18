@@ -27,9 +27,8 @@ function CustomDrawerContent({
       try {
         const token = await AsyncStorage.getItem('token');
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
         const response = await axios.get(`${path}/api/users/current`);
-
+        console.log(token)
         if (response.status === 200) {
           if (response.data.role.includes('medecin') && !response.data.role.includes('admin')) {
             fetchMedecinDayConsultations(path,response.data._id, updateConsultations);

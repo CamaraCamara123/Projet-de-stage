@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Dimensions, ScrollView } from 'react-native';
 import { Block, theme } from 'galio-framework';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -7,6 +7,9 @@ import { View, Text } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { fetchConsultation } from '../components/fetchElement/fetchConsultation';
 import CardDiagnostic from '../components/CardDiagnostic';
+import { useAuth } from '../contexts/useAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 
 
@@ -15,6 +18,25 @@ const { width } = Dimensions.get('screen');
 const Diagnostics = ({ navigation }) => {
     const { diagnostics, consultation, updateConsultation, path } = useUserData()
     const [searchValue, setSearchValue] = useState('');
+    const { logout } = useAuth()
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const token = await AsyncStorage.getItem('token');
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            try {
+                const response = await axios.get(`${path}/api/users/current`);
+                if (response.status == 200) {
+                    console.log('ici');
+                }
+            } catch (error) {
+                logout();
+                navigation.navigate("Login");
+            }
+        };
+            fetchUserData();
+          
+    }, []);
 
     const filtereddiagnostics = diagnostics.filter((diagnos) => {
         return (
@@ -24,7 +46,7 @@ const Diagnostics = ({ navigation }) => {
     });
 
     const newdiagnos = () => {
-        fetchConsultation(path,consultation._id, updateConsultation);
+        fetchConsultation(path, consultation._id, updateConsultation);
         navigation.navigate("New_Diagnostic")
     }
     const renderdiagnostics = () => {
@@ -61,15 +83,15 @@ const Diagnostics = ({ navigation }) => {
                     </Block>
                 </ScrollView>
                 <View style={styles.addContainer}>
-                        <TouchableOpacity onPress={newdiagnos}>
-                            <Icon
-                                name="plus"
-                                size={40}
-                                style={styles.addIcon}
-                                color="green"
-                            />
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={newdiagnos}>
+                        <Icon
+                            name="plus"
+                            size={40}
+                            style={styles.addIcon}
+                            color="green"
+                        />
+                    </TouchableOpacity>
+                </View>
             </Block>
         )
     }

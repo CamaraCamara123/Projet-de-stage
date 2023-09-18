@@ -26,6 +26,7 @@ import { fetchConsultationDiagnostic } from "../components/fetchElement/fetchDia
 
 const { width, height } = Dimensions.get("screen");
 
+
 const New_Diagnostic = () => {
     const [descripSymptome, setDescripSymptome] = useState(null);
     const [successMessage, setSuccessMessage] = useState("");
@@ -39,6 +40,7 @@ const New_Diagnostic = () => {
     const [isPreview, setIsPreview] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
     const cameraRef = useRef(null);
+
 
     ///////////////////////////// lancer le diagnostic///////////////
     const handlerDiagnostic = async (diagnostic, id) => {
@@ -107,7 +109,7 @@ const New_Diagnostic = () => {
             console.error("Erreur lors de l'enregistrement de la diagnostic", error);
             setErrorMessage("Error during registration. Please try again.");
             setSuccessMessage("");
-
+            navigation.navigate('Home')
         }
     }
 

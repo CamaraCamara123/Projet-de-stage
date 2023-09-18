@@ -12,11 +12,11 @@ function Home() {
   return (
     <Transition>
       <div className='home-container' style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-      <div className='home-title-container'>
+      {/* <div className='home-title-container'>
         <h1 className='home-title'>WELCOME ON DERMATO PAGE</h1>
-      </div>
-        <Row>
-          <Col>
+      </div> */}
+        <Row style={{margingTop:'0px'}}>
+          <Col style={{margingTop:'0px'}}>
             <Container className='card-container-home'>
               <Row>
                 <Col>
@@ -24,10 +24,7 @@ function Home() {
                     <Card.Header><FontAwesomeIcon icon={faTrashAlt} /></Card.Header>
                     <Card.Body className='home-card-body'>
                       <p>This report presents a comprehensive overview of my year-end internship at Z SMART SERVICES,
-                        detailing the tasks undertaken and achievements accomplished. Throughout this internship,
-                        I had the opportunity to work on a project aimed at applying and enhancing our knowledge,
-                        focusing on the design and development of a Dermatological Diagnostic Assistance platform
-                        tailored for healthcare professionals, harnessing the power of AI.</p>
+                        detailing the tasks undertaken and achievements accomplished..</p>
                     </Card.Body>
                   </Card>
                 </Col>
@@ -36,10 +33,7 @@ function Home() {
                     <Card.Header><FontAwesomeIcon icon={faTrashAlt} /></Card.Header>
                     <Card.Body className='home-card-body'>
                       <p>This report presents a comprehensive overview of my year-end internship at Z SMART SERVICES,
-                        detailing the tasks undertaken and achievements accomplished. Throughout this internship,
-                        I had the opportunity to work on a project aimed at applying and enhancing our knowledge,
-                        focusing on the design and development of a Dermatological Diagnostic Assistance platform
-                        tailored for healthcare professionals, harnessing the power of AI.</p>
+                        detailing the tasks undertaken and achievements accomplished.</p>
                     </Card.Body>
                   </Card>
                 </Col>

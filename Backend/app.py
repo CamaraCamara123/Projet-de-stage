@@ -82,7 +82,6 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
-
         if "Authorization" in request.headers:
             auth_header = request.headers["Authorization"]
             token = (
@@ -297,7 +296,7 @@ def get_current_user(current_user):
 @app.route("/api/users/patient/create", methods=["POST"])
 @token_required
 # @login_required
-# @admin_required
+# @secretaire_required
 def create_patient(current_user):
     data = request.get_json()
     tel = data.get("tel")
