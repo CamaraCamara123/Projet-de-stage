@@ -111,8 +111,14 @@ app = Flask(__name__)
 CORS(app)  # Active les en-têtes CORS pour toutes les routes
 app.config["SECRET_KEY"] = secrets.token_hex(16)
 app.config["UPLOAD_FOLDER"] = os.path.dirname(__file__)
-app.config["MONGODB_SETTINGS"] = {"db": "donnees", "host": "localhost", "port": 27017}
-connect(host="mongodb://localhost:27017/donnees")
+app.config["MONGODB_SETTINGS"] = {
+    "db": "Medical",
+    "host": " mongodb+srv://aboudramanecamara9:tt4rjV3SnGu5vEVi@cluster0.7xbx9c8.mongodb.net/",
+    "retryWrites": False,
+}
+# connect(host="mongodb://localhost:27017/donnees")
+connect(host="mongodb+srv://aboudramanecamara9:tt4rjV3SnGu5vEVi@cluster0.7xbx9c8.mongodb.net/Medical")
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -144,8 +150,8 @@ def uploaded_file(filename):
 ############################################# Admin ###############################################################
 @app.route("/api/user/admin/create", methods=["POST"])
 @token_required
-@login_required
-@admin_required
+# @login_required
+# @admin_required
 def create_admin(current_user):
     data = request.get_json()
     username = data.get("username")
@@ -171,6 +177,8 @@ def create_admin(current_user):
 
     nom = data.get("nom")
     prenom = data.get("prenom")
+    tel = data.get('tel')
+    genre = data.get('genre')
 
     admin = User(
         username=username,
@@ -178,6 +186,8 @@ def create_admin(current_user):
         confirmPassword=hashed_password,
         nom=nom,
         prenom=prenom,
+        tel=tel,
+        genre = genre,
         role=["admin", "medecin", "patient"],
     )
 
@@ -356,7 +366,7 @@ def create_patient(current_user):
 @app.route("/api/users/user/upload-image/<string:username>", methods=["PUT"])
 @token_required
 # @login_required
-def upload_patient_image(current_user,username):
+def upload_patient_image(current_user, username):
     user = User.objects.get(username=username)
 
     if "image" not in request.files:
@@ -406,7 +416,7 @@ def get_patients(current_user):
 @app.route("/api/users/user/<string:user_id>", methods=["GET"])
 @token_required
 # @login_required
-def get_user_by_id(current_user,user_id):
+def get_user_by_id(current_user, user_id):
     try:
         user = User.objects.get(pk=user_id)
     except DoesNotExist:
@@ -421,7 +431,7 @@ def get_user_by_id(current_user,user_id):
 @app.route("/api/users/patient/update/<string:patient_id>", methods=["PUT"])
 @token_required
 # @login_required
-def update_patient(current_user,patient_id):
+def update_patient(current_user, patient_id):
     data = request.get_json()
 
     try:
@@ -452,7 +462,7 @@ def update_patient(current_user,patient_id):
 @token_required
 # @login_required
 # @admin_required
-def delete_patient(current_user,patient_id):
+def delete_patient(current_user, patient_id):
     try:
         patient = Patient.objects.get(pk=patient_id)
     except Patient.DoesNotExist:
@@ -571,7 +581,7 @@ def get_all_dermatologues(current_user):
 @token_required
 # @login_required
 # @admin_required
-def delete_dermatologue(current_user,dermatologue_id):
+def delete_dermatologue(current_user, dermatologue_id):
     try:
         dermatologue = Dermatologue.objects.get(pk=dermatologue_id)
     except Dermatologue.DoesNotExist:
@@ -610,7 +620,7 @@ def delete_dermatologue(current_user,dermatologue_id):
 @token_required
 # @login_required
 # @admin_required
-def update_dermatologue(current,dermatologue_id):
+def update_dermatologue(current, dermatologue_id):
     data = request.get_json()
 
     try:
@@ -639,17 +649,16 @@ def update_dermatologue(current,dermatologue_id):
 ########################################## les patients par medecin ####################################
 @app.route("/api/medecin/patients/<string:medecin_id>", methods=["GET"])
 @token_required
-def get_patients_for_medecin(current_user,medecin_id):
+def get_patients_for_medecin(current_user, medecin_id):
     rdvs = Rendez_vous.objects(medecin=medecin_id).all()
-    
+
     unique_patients = set()
-    
+
     for rdv in rdvs:
         unique_patients.add(rdv.patient)
-    
+
     patients_data = [convert_objet_to_dict(patient) for patient in unique_patients]
     return jsonify(patients_data), 200
-
 
 
 # ###########################################################################################
@@ -741,7 +750,7 @@ def get_secretaires(current_user):
 # @login_required
 # @admin_required
 # @secretaire_required
-def update_secretaire(current_user,secretaire_id):
+def update_secretaire(current_user, secretaire_id):
     data = request.get_json()
 
     try:
@@ -767,7 +776,7 @@ def update_secretaire(current_user,secretaire_id):
 # ############################### delete secretaire ########################################
 @app.route("/api/users/secretaire/delete/<string:secretaire_id>", methods=["DELETE"])
 @token_required
-def delete_secretaire(current_user,secretaire_id):
+def delete_secretaire(current_user, secretaire_id):
     try:
         secretaire = Secretaire.objects.get(pk=secretaire_id)
     except Secretaire.DoesNotExist:
@@ -790,7 +799,7 @@ def delete_secretaire(current_user,secretaire_id):
 # #################################### creation de rendez vous ##############################
 @app.route("/api/rendez_vous/<string:patient_id>/<string:medecin_id>", methods=["POST"])
 @token_required
-def create_rdv(current_user,patient_id, medecin_id):
+def create_rdv(current_user, patient_id, medecin_id):
     try:
         patient = Patient.objects.get(pk=patient_id)
     except Patient.DoesNotExist:
@@ -829,7 +838,7 @@ def create_rdv(current_user,patient_id, medecin_id):
 # @login_required
 # @admin_required
 # @secretaire_required
-def delete_rdv(current_user,rdv_id):
+def delete_rdv(current_user, rdv_id):
     try:
         rdv = Rendez_vous.objects.get(pk=rdv_id)
     except Rendez_vous.DoesNotExist:
@@ -897,7 +906,7 @@ def get_rdvs(current_user):
 #################################### get rdv by id #####################################################
 @app.route("/api/rendez_vous/<string:rdv_id>", methods=["GET"])
 @token_required
-def get_rdv(current_user,rdv_id):
+def get_rdv(current_user, rdv_id):
     try:
         rdv = Rendez_vous.objects().get(pk=rdv_id)
     except Rendez_vous.DoesNotExist:
@@ -909,7 +918,7 @@ def get_rdv(current_user,rdv_id):
 #################################### get rdv by patient #################################################
 @app.route("/api/rendez_vous/patient/<string:patient_id>", methods=["GET"])
 @token_required
-def get_rdv_by_patient(current_user,patient_id):
+def get_rdv_by_patient(current_user, patient_id):
     try:
         patient = Patient.objects.get(pk=patient_id)
     except Patient.DoesNotExist:
@@ -941,7 +950,7 @@ def get_today_rdv(current_user):
 #################################### get rdv by medecin #################################################
 @app.route("/api/rendez_vous/dermatologue/<string:derm_id>", methods=["GET"])
 @token_required
-def get_rdv_by_dermatologue(current_user,derm_id):
+def get_rdv_by_dermatologue(current_user, derm_id):
     try:
         derms = Dermatologue.objects.get(pk=derm_id)
     except Dermatologue.DoesNotExist:
@@ -955,33 +964,34 @@ def get_rdv_by_dermatologue(current_user,derm_id):
     rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
     return jsonify(rdv_data), 200
 
+
 #################################### get doctor futur rdv #################################################
 @app.route("/api/rdv/dermatologue/futur/<string:derm_id>", methods=["GET"])
 @token_required
-def medecin_futur_rdv(current_user,derm_id):
+def medecin_futur_rdv(current_user, derm_id):
     try:
         derms = Dermatologue.objects.get(pk=derm_id)
     except Dermatologue.DoesNotExist:
         return jsonify({"message": "Dermatologue introuvable"}), 404
 
     today = datetime.datetime.today()
-   
+
     start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
     end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
 
     # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
     rdvs = Rendez_vous.objects.filter(
-        Q(medecin=derms)
-        & Q(dateDebutRdv__gte=start_of_day)
+        Q(medecin=derms) & Q(dateDebutRdv__gte=start_of_day)
     ).order_by("-dateDebutRdv")
 
     rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
-    return jsonify(rdv_data),200
+    return jsonify(rdv_data), 200
+
 
 #################################### get doctor day rendez-vous #################################################
 @app.route("/api/rendez-vous/dermatologue/today/<string:derm_id>", methods=["GET"])
 @token_required
-def get_dermatologue_today_rdv(current_user,derm_id):
+def get_dermatologue_today_rdv(current_user, derm_id):
     try:
         derms = Dermatologue.objects.get(pk=derm_id)
     except Dermatologue.DoesNotExist:
@@ -1002,12 +1012,13 @@ def get_dermatologue_today_rdv(current_user,derm_id):
     ).order_by("-dateDebutRdv")
     print("rdvs : ")
     rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
-    return jsonify(rdv_data),200
+    return jsonify(rdv_data), 200
+
 
 ######################################## update rendez vous ##############################################
 @app.route("/api/rendez_vous/update/<string:rdv_id>", methods=["PUT"])
 @token_required
-def update_rdv(current_user,rdv_id):
+def update_rdv(current_user, rdv_id):
     try:
         rdv = Rendez_vous.objects.get(pk=rdv_id)
     except Rendez_vous.DoesNotExist:
@@ -1031,7 +1042,7 @@ def update_rdv(current_user,rdv_id):
 ######################################################################## Gestion consultation #####################################
 @app.route("/api/consultation/create/<string:rdv_id>", methods=["POST"])
 @token_required
-def remplir_consultation(current_user,rdv_id):
+def remplir_consultation(current_user, rdv_id):
     data = request.get_json()
 
     try:
@@ -1063,7 +1074,7 @@ def get_consultations(current_user):
 ################################################### consultation by id ########################################################################
 @app.route("/api/consultation/<string:consult_id>", methods=["GET"])
 @token_required
-def get_consultation(current_user,consult_id):
+def get_consultation(current_user, consult_id):
     try:
         consult = Consultation.objects.get(pk=consult_id)
     except Consultation.DoesNotExist:
@@ -1078,7 +1089,7 @@ def get_consultation(current_user,consult_id):
     methods=["GET"],
 )
 @token_required
-def consultation_medecin_patient(current_user,medecin_id, patient_id):
+def consultation_medecin_patient(current_user, medecin_id, patient_id):
     try:
         medecin = Dermatologue.objects.get(pk=medecin_id)
     except Dermatologue.DoesNotExist:
@@ -1104,7 +1115,7 @@ def consultation_medecin_patient(current_user,medecin_id, patient_id):
 #################################### get doctor day visite #################################################
 @app.route("/api/visite/dermatologue/today/<string:derm_id>", methods=["GET"])
 @token_required
-def get_dermatologue_today_visite(current_user,derm_id):
+def get_dermatologue_today_visite(current_user, derm_id):
     try:
         derms = Dermatologue.objects.get(pk=derm_id)
     except Dermatologue.DoesNotExist:
@@ -1137,7 +1148,7 @@ def get_dermatologue_today_visite(current_user,derm_id):
     methods=["GET"],
 )
 @token_required
-def consultation_patient(current_user,patient_id):
+def consultation_patient(current_user, patient_id):
     try:
         patient = Patient.objects.get(pk=patient_id)
     except Patient.DoesNotExist:
@@ -1158,7 +1169,7 @@ def consultation_patient(current_user,patient_id):
 ################################################### supprimer consultation ######################################################
 @app.route("/api/consultation/delete/<string:consult_id>", methods=["DELETE", "PUT"])
 @token_required
-def delete_consultation(current_user,consult_id):
+def delete_consultation(current_user, consult_id):
     try:
         consultation = Consultation.objects.get(pk=consult_id)
     except Consultation.DoesNotExist:
@@ -1172,10 +1183,13 @@ def delete_consultation(current_user,consult_id):
                 diagnostic.delete()
             except OSError:
                 pass
-        img_folder = os.path.join(app.config["UPLOAD_FOLDER"], "uploads",
+        img_folder = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            "uploads",
             "images",
             "consultation",
-            consultation.rdv.patient.username)
+            consultation.rdv.patient.username,
+        )
         try:
             shutil.rmtree(img_folder)
             diagnostic.delete()
@@ -1183,7 +1197,7 @@ def delete_consultation(current_user,consult_id):
             pass
     rdv = Rendez_vous.objects.get(pk=consultation.rdv._id)
     rdv.consultation = None
-    rdv.statut=False
+    rdv.statut = False
     rdv.save()
     consultation.delete()
 
@@ -1195,7 +1209,7 @@ def delete_consultation(current_user,consult_id):
     "/api/consultation/update/<string:consult_id>/<string:medecin_id>", methods=["PUT"]
 )
 @token_required
-def update_consultation(current_user,consult_id, medecin_id):
+def update_consultation(current_user, consult_id, medecin_id):
     data = request.get_json()
     try:
         consultation = Consultation.objects.get(pk=consult_id)
@@ -1261,7 +1275,7 @@ def update_consultation(current_user,consult_id, medecin_id):
 ###################################################### create diagnostic #####################################################################################
 @app.route("/api/diagnostic/create/<string:consult_id>", methods=["POST"])
 @token_required
-def new_diagnostic(current_user,consult_id):
+def new_diagnostic(current_user, consult_id):
     data = request.get_json()
     try:
         consultation = Consultation.objects.get(pk=consult_id)
@@ -1284,7 +1298,7 @@ def new_diagnostic(current_user,consult_id):
 ######################################################### upload image diagnostic ######################################################
 @app.route("/api/diagnostic/upload-image/<string:diagnostic_id>", methods=["PUT"])
 @token_required
-def upload_consutation_image(current_user,diagnostic_id):
+def upload_consutation_image(current_user, diagnostic_id):
     diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
 
     if "image" not in request.files:
@@ -1324,20 +1338,23 @@ def upload_consutation_image(current_user,diagnostic_id):
 
     return jsonify({"message": "Invalid file type"}), 400
 
+
 ############################################################# diagnostic by id ########################################################################################
 @app.route("/api/diagnostic/<string:diagnostic_id>", methods=["GET"])
 @token_required
-def get_diagnostic(current_user,diagnostic_id):
+def get_diagnostic(current_user, diagnostic_id):
     try:
         diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
     except Diagnostic.DoesNotExist:
         return jsonify({"message": "Diagnostic not found"}), 400
     diagnostic_data = convert_objet_to_dict(diagnostic)
     return jsonify(diagnostic_data), 200
+
+
 ############################################################## update diagnostic==> faire des prescriptions ############################################################
 @app.route("/api/diagnostic/update/<string:diagnostic_id>", methods=["PUT"])
 @token_required
-def diagnostic_update(current_user,diagnostic_id):
+def diagnostic_update(current_user, diagnostic_id):
     data = request.get_json()
     try:
         diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
@@ -1355,7 +1372,7 @@ def diagnostic_update(current_user,diagnostic_id):
 ####################################################### lancer le diagnostic de la consultation ################################################################
 @app.route("/api/consult/diagnostic/<string:diagnostic_id>", methods=["PUT"])
 @token_required
-def diagnostic_maladie(current_user,diagnostic_id):
+def diagnostic_maladie(current_user, diagnostic_id):
     try:
         diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
     except Diagnostic.DoesNotExist:
@@ -1415,7 +1432,7 @@ def diagnostic_maladie(current_user,diagnostic_id):
     methods=["PUT"],
 )
 @token_required
-def valide_diagnostic(current_user,diagnostic_id, maladie_id):
+def valide_diagnostic(current_user, diagnostic_id, maladie_id):
     try:
         diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
     except Diagnostic.DoesNotExist:
@@ -1442,8 +1459,7 @@ def valide_diagnostic(current_user,diagnostic_id, maladie_id):
     )
     image_stade.stade = stade
     print(diagnostic.imagePath)
-    source_file_path = os.path.join(
-        app.config["UPLOAD_FOLDER"],diagnostic.imagePath)
+    source_file_path = os.path.join(app.config["UPLOAD_FOLDER"], diagnostic.imagePath)
     destination_file_path = os.path.join(
         app.config["UPLOAD_FOLDER"],
         "uploads",
@@ -1460,25 +1476,27 @@ def valide_diagnostic(current_user,diagnostic_id, maladie_id):
 
     return jsonify({"message": "validation done successfully"}), 200
 
+
 ################################################## diagnostics par consultation  #####################################################################
 @app.route("/api/consultation/diagnostics/<string:consult_id>", methods=["GET"])
 @token_required
-def diagnostics_by_consultation(current_user,consult_id):
+def diagnostics_by_consultation(current_user, consult_id):
     try:
         consultation = Consultation.objects.get(pk=consult_id)
     except Consultation.DoesNotExist:
         return jsonify({"message": "Consultation not found"}), 404
 
-    diagnostics = Diagnostic.objects.filter(consultation=consultation).order_by("-dateDiagnostic")
-    diagnostic_data = [
-        convert_objet_to_dict(diagnostic) for diagnostic in diagnostics
-    ]
+    diagnostics = Diagnostic.objects.filter(consultation=consultation).order_by(
+        "-dateDiagnostic"
+    )
+    diagnostic_data = [convert_objet_to_dict(diagnostic) for diagnostic in diagnostics]
     return jsonify(diagnostic_data), 201
+
 
 ################################################### supprimer diagnostic ######################################################
 @app.route("/api/diagnostic/delete/<string:diagnostic_id>", methods=["DELETE", "PUT"])
 @token_required
-def delete_diagnostic(current_user,diagnostic_id):
+def delete_diagnostic(current_user, diagnostic_id):
     try:
         diagnostic = Diagnostic.objects.get(pk=diagnostic_id)
     except Diagnostic.DoesNotExist:
@@ -1486,9 +1504,12 @@ def delete_diagnostic(current_user,diagnostic_id):
 
     formatted_datetime = diagnostic.dateDiagnostic.strftime("%Y-%m-%d_%H-%M-%S")
     diagnostic_folder = os.path.join(
-        app.config["UPLOAD_FOLDER"],'uploads','images',"consultation",
+        app.config["UPLOAD_FOLDER"],
+        "uploads",
+        "images",
+        "consultation",
         diagnostic.consultation.rdv.patient.username,
-        formatted_datetime
+        formatted_datetime,
     )
     consultation = Consultation.objects.get(pk=diagnostic.consultation._id)
     consultation.diagnostics.remove(diagnostic)
@@ -1535,7 +1556,7 @@ def get_maladies(current_user):
 ################################################################# rechercher maladie par id ###################################################
 @app.route("/api/maladie/<string:maladie_id>", methods=["GET"])
 @token_required
-def maladie_by_id(current_user,maladie_id):
+def maladie_by_id(current_user, maladie_id):
     try:
         maladie = Maladie.objects.get(pk=maladie_id)
     except Maladie.DoesNotExist:
@@ -1548,7 +1569,7 @@ def maladie_by_id(current_user,maladie_id):
 ############################################################### Mise à jour maladie #############################################################
 @app.route("/api/maladie/update/<string:maladie_id>", methods=["PUT"])
 @token_required
-def maladie_update(current_user,maladie_id):
+def maladie_update(current_user, maladie_id):
     data = request.get_json()
 
     try:
@@ -1567,7 +1588,7 @@ def maladie_update(current_user,maladie_id):
 ############################################################ supprimer maladie ##################################################################
 @app.route("/api/maladie/delete/<string:maladie_id>", methods=["DELETE"])
 @token_required
-def delete_maladie(current_user,maladie_id):
+def delete_maladie(current_user, maladie_id):
     try:
         maladie = Maladie.objects.get(pk=maladie_id)
     except Maladie.DoesNotExist:
@@ -1613,7 +1634,7 @@ def delete_maladie(current_user,maladie_id):
 ####################################################################### gestion stades maladies ##############################################
 @app.route("/api/stade/create/<string:maladie_id>", methods=["POST"])
 @token_required
-def create_stade(current_user,maladie_id):
+def create_stade(current_user, maladie_id):
     data = request.get_json()
     stade = data.get("stade")
     description = data.get("description")
@@ -1635,7 +1656,7 @@ def create_stade(current_user,maladie_id):
 ########################################################## get stade by id ######################################################################
 @app.route("/api/stade/<string:stade_id>", methods=["GET"])
 @token_required
-def get_stade(current_user,stade_id):
+def get_stade(current_user, stade_id):
     try:
         stade = Stade.objects.get(pk=stade_id)
     except Stade.DoesNotExist:
@@ -1648,7 +1669,7 @@ def get_stade(current_user,stade_id):
 ######################################################### stades par  Maladies ##################################################################
 @app.route("/api/maladie/stades/<string:maladie_id>", methods=["GET"])
 @token_required
-def get_stades_by_Maladie(current_user,maladie_id):
+def get_stades_by_Maladie(current_user, maladie_id):
     try:
         maladie = Maladie.objects.get(pk=maladie_id)
     except Maladie.DoesNotExist:
@@ -1663,7 +1684,7 @@ def get_stades_by_Maladie(current_user,maladie_id):
 ######################################################### supprimer stade ##################################################################
 @app.route("/api/maladie/stade/delete/<string:stade_id>", methods=["DELETE"])
 @token_required
-def delete_stade(current_user,stade_id):
+def delete_stade(current_user, stade_id):
     try:
         stade = Stade.objects.get(pk=stade_id)
     except Stade.DoesNotExist:
@@ -1705,7 +1726,7 @@ def delete_stade(current_user,stade_id):
 ######################################################### gestion images Stades ########################################################################
 @app.route("/api/stade/image/create/<string:stade_id>", methods=["POST"])
 @token_required
-def create_image(current_user,stade_id):
+def create_image(current_user, stade_id):
     stade = Stade.objects.get(pk=stade_id)
 
     if "image" not in request.files:
@@ -1751,7 +1772,7 @@ def create_image(current_user,stade_id):
 ################################################## supprimer image stade #################################################
 @app.route("/api/maladie/stade/image/delete/<string:img_id>", methods=["DELETE"])
 @token_required
-def delete_image_stade(current_user,img_id):
+def delete_image_stade(current_user, img_id):
     try:
         image = ImageStade.objects.get(pk=img_id)
     except Image.DoesNotExist:
@@ -1771,7 +1792,7 @@ def delete_image_stade(current_user,img_id):
 ######################################### images par stade ########################################################
 @app.route("/api/maladie/stade/images/<string:stade_id>", methods=["GET"])
 @token_required
-def images_stade(current_user,stade_id):
+def images_stade(current_user, stade_id):
     try:
         stade = Stade.objects.get(pk=stade_id)
     except Stade.DoesNotExist:
