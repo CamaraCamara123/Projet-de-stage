@@ -52,7 +52,7 @@ export function UserDataProvider({ children }) {
   const [medecinRdvs, setMedecinRdvs] = useState([])
   const [daysOff, setDaysOff] = useState([])
   const [doublons, setDoublons] = useState([])
-  const [path, setPath] = useState("http://192.168.11.104:5000");
+  const [path, setPath] = useState("https://kind-pear-crayfish-cape.cyclic.cloud");
 
 
   const openModal = () => {
