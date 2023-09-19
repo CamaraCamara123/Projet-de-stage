@@ -21,7 +21,7 @@ from flask_cors import CORS
 from modelML import get_model
 import jwt
 import shutil
-import cv2
+# import cv2
 from matplotlib import pyplot as plt
 import numpy as np
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
