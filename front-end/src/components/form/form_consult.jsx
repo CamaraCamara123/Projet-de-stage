@@ -5,11 +5,11 @@ import axios from "axios"; // Import Axios
 import "./form.css";
 import { Link, Navigate } from "react-router-dom";
 import { useUserData } from "../../contexts/UserDataContext";
-import { fetchConsultationsRdv } from "../fetchElement/fetchConsultations";
+// import { fetchConsultationsRdv } from "../fetchElement/fetchConsultations";
 import symptoms from "../../constants/list_symptoms";
 import Select from "react-select";
-import { fetchMedecinRdvs, fetchPatientRdvs, fetchRdvs } from "../fetchElement/fetchRdvs";
-import { Week, Month, Day, WorkWeek, TimelineViews, TimelineMonth, Agenda, ScheduleComponent, Inject } from '@syncfusion/ej2-react-schedule';
+// import { fetchMedecinRdvs, fetchRdvs } from "../fetchElement/fetchRdvs";
+// import { Week, Month, Day, WorkWeek, TimelineViews, TimelineMonth, Agenda, ScheduleComponent, Inject } from '@syncfusion/ej2-react-schedule';
 import '@syncfusion/ej2-base/styles/material.css';
 import '@syncfusion/ej2-react-buttons/styles/material.css';
 import '@syncfusion/ej2-react-calendars/styles/material.css';
@@ -43,7 +43,7 @@ function Form_consultation({ open, consultationToUpdate }) {
                 const consultation = response.data;
                 console.log("update consultation done :", consultation);
                 setErrorMessage("");
-                fetchConsultationsRdv(path,consultationToUpdate.rdv._id, updateConsultations);
+                // fetchConsultationsRdv(path,consultationToUpdate.rdv._id, updateConsultations);
                 setModalIsOpen(false);
             }
         } catch (error) {

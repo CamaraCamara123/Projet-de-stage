@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import { useUserData } from '../../contexts/UserDataContext';
 import "./form.css"
+import Loading from '../../constants/loading';
 
 function Form_detail_stade() {
     const { images, path,maladie } = useUserData(); 
-    console.log(images.length);
+    const [ok, setOk] = useState(false);
 
+    useEffect(()=>{
+        if(images.length !=0){
+            setOk(true);
+        }
+    },[images.length])
     const imagesPerPage = 52;
     const totalPages = Math.ceil(images.length / imagesPerPage);
 
@@ -27,6 +33,12 @@ function Form_detail_stade() {
                     <h2 className='titre-stade'>{maladie.nom} stage details</h2>
                 </Col>
             </Row>
+            {!ok&&<Row>
+                <Col>
+                    <Loading/>
+                </Col>
+            </Row>}
+            {ok&&<>
             <Row className='img-row'>
                 {visibleImages.map((image, index) => (
                     <Col key={index} lg={3} sm={6} xs={12}>
@@ -59,6 +71,7 @@ function Form_detail_stade() {
                     </div>
                 </Col>
             </Row>
+            </>}
         </Container>
     );
 }

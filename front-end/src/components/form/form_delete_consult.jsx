@@ -4,23 +4,26 @@ import axios from "axios"; // Import Axios
 import "./form.css";
 import { Link, Navigate } from "react-router-dom";
 import { useUserData } from "../../contexts/UserDataContext";
-import { fetchConsultations, fetchConsultationsRdv } from "../fetchElement/fetchConsultations";
+import { fetchConsultations, fetchPatientVisite } from "../fetchElement/fetchConsultations";
 import { useNavigate } from 'react-router-dom';
+import Loading from "../../constants/loading";
 
 
 function Form__delete_consultation({ open, consultationToDelete }) {
   const [modalIsOpen, setModalIsOpen] = useState(open);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { updateConsultations, path } = useUserData()
+  const { updateConsultations, path, patient } = useUserData()
   const navigate = useNavigate();
+  const [ok, setOk] = useState(false);
 
 
   const onDelete = () => {
     setModalIsOpen(false);
-    fetchConsultationsRdv(path, consultationToDelete.rdv._id, updateConsultations)
+    fetchPatientVisite(path, consultationToDelete.rdv.patient._id, updateConsultations)
   }
   const handleDelete = async () => {
+    setOk(true);
     try {
       const token = localStorage.getItem('token');
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -29,7 +32,7 @@ function Form__delete_consultation({ open, consultationToDelete }) {
       );
 
       if (response.status === 200) {
-        fetchConsultationsRdv(path, consultationToDelete.rdv._id, updateConsultations)
+        fetchPatientVisite(path, consultationToDelete.rdv.patient._id, updateConsultations)
         setSuccessMessage("consultation deleted successfully!");
         setErrorMessage("");
         onDelete();
@@ -48,6 +51,8 @@ function Form__delete_consultation({ open, consultationToDelete }) {
 
   return (
     <Modal show={modalIsOpen} onHide={handleCloseModal}>
+    {ok&&<Loading/>}
+    {!ok&&<>
       <Modal.Header closeButton>
         <Modal.Title>Deletion Confirmation</Modal.Title>
       </Modal.Header>
@@ -64,6 +69,7 @@ function Form__delete_consultation({ open, consultationToDelete }) {
           Confirm
         </Button>
       </Modal.Footer>
+      </>}
     </Modal>
   );
 }

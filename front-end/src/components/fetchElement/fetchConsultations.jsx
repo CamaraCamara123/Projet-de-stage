@@ -35,21 +35,21 @@ export const fetchConsultations = async (path,updateConsultations) => {
     }
   };
 
-  export const fetchConsultationsRdv = async (path,rdv_id,updateConsultation) => {
-    const token = localStorage.getItem('token');
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    try {
-      const response = await axios.get(`${path}/api/rdv/consultation/${rdv_id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      updateConsultation(response.data);
-      console.log(response.data)
-    } catch (error) {
-      console.error('Erreur lors de la récupération des données consultations :', error);
-    }
-  };
+  // export const fetchConsultationsRdv = async (path,rdv_id,updateConsultation) => {
+  //   const token = localStorage.getItem('token');
+  //   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  //   try {
+  //     const response = await axios.get(`${path}/api/rdv/consultation/${rdv_id}`, {
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
+  //     updateConsultation(response.data);
+  //     console.log(response.data)
+  //   } catch (error) {
+  //     console.error('Erreur lors de la récupération des données consultations :', error);
+  //   }
+  // };
 
   //visites du jour du medecin
   export const fetchMedecinDayConsultations = async (path,medecin_id,updateConsultations) => {

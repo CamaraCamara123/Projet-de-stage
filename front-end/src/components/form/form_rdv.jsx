@@ -71,15 +71,7 @@ function Form_rdv() {
 
                     if (response.status === 200) {
                         const rdv = response.data;
-                        if (userData.role.includes('secretaire') && !userData.role.includes('admin')) {
-                            fetchPatientRdvs(path, userData._id, updateRdvs)
-                        }
-                        else if (userData.role.includes('medecin') && !userData.role.includes('admin')) {
-                            fetchMedecinRdvs(path, userData._id, updateRdvs)
-                        }
-                        else {
-                            fetchRdvs(path, updateRdvs)
-                        }
+                        await fetchPatientRdvs(path, patient._id, updateRdvs)
                         console.log("update rdv done :", rdv);
                         setSuccessMessage("Updated successful!");
                         navigate('/dashboard/rdv');
@@ -105,15 +97,9 @@ function Form_rdv() {
 
                     if (response.status === 200) {
                         const rdv = response.data;
-                        if (userData.role.includes('secretaire') && !userData.role.includes('admin')) {
-                            fetchPatientRdvs(path, userData._id, updateRdvs)
-                        }
-                        else if (userData.role.includes('medecin') && !userData.role.includes('admin')) {
-                            fetchMedecinRdvs(path, userData._id, updateRdvs)
-                        }
-                        else {
-                            fetchRdvs(path, updateRdvs)
-                        }
+
+                        fetchPatientRdvs(path, patient._id, updateRdvs)
+
                         console.log("Nouveau rdv enregistré :", rdv);
                         setSuccessMessage("Registration successful!");
                         setErrorMessage("");
@@ -219,7 +205,7 @@ function Form_rdv() {
 
         return (
             <div className="button-container">
-                <h2 className="day-title">Days of the Month ({monthNames[new Date().getMonth()]})</h2>
+                <h2 className="day-title">DAYS OF THE MONTH ({monthNames[new Date().getMonth()]})</h2>
                 <div className="button-group">
                     {daysOfMonth.map((day) => (
                         <button key={day} className="day-button" onClick={(event) => handleCellClick(event, day)}>
@@ -275,7 +261,7 @@ function Form_rdv() {
         console.log("debut : ", dateDebutRdv, " Fin : ", dateFinRdv)
         return (
             <div className="hour-container">
-                <h2 className="hour-title">Choose a time slot</h2>
+                {/* <h2 className="hour-title">TIME SLOT</h2> */}
                 <div>
                     {timeSlots.map((timeSlot, index) => (
                         <button
@@ -287,7 +273,7 @@ function Form_rdv() {
                         </button>
                     ))}
                 </div>
-                <p>Selected timeslot : {selectedTimeSlot || 'Aucun'}</p>
+                <p><span className="hour-selected">Selected timeslot : </span> {selectedTimeSlot || 'Aucun'}</p>
             </div>
         );
     };

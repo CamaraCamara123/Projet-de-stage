@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 import { useAuth } from "../../contexts/AuthContext";
-import logo from './logo-love.png'
+import logo from './Green.png'
 function NavBar() {
   const [click, setClick] = useState(false);
   const {isLoggedIn} = useAuth()
@@ -12,7 +12,7 @@ function NavBar() {
       <nav className="navbar">
         <div className="nav-container">
           <NavLink exact to="/" className="nav-logo">
-            <img src={logo} alt="logo" width={200} height={150} />
+            <img src={logo} alt="logo" width={150} height={90}  className="logo-nav"/>
           </NavLink>
 
           <ul className={click ? "nav-menu active" : "nav-menu"}>

@@ -6,7 +6,7 @@ import { useUserData } from '../../contexts/UserDataContext';
 import { useNavigate } from 'react-router-dom';
 import "./form.css";
 import { useEffect } from 'react';
-
+import Loading from '../../constants/loading';
 
 export default function Form_maladie({ open, maladieToUpdate }) {
   const [maladie, setMaladie] = useState('');
@@ -187,8 +187,9 @@ export default function Form_maladie({ open, maladieToUpdate }) {
     setModalIsOpen(false);
   }
   return (
-    <Modal show={modalIsOpen} onHide={handleCloseModal}>
-      <form onSubmit={handleSubmit}>
+    <Modal show={modalIsOpen} onHide={handleCloseModal} className={ok?'':'modal-container'}>
+      {!ok&&<Loading/>}
+      {ok&&<form onSubmit={handleSubmit}>
         <Modal.Header closeButton>
           <Modal.Title>DISEASE FORM</Modal.Title>
         </Modal.Header>
@@ -255,15 +256,15 @@ export default function Form_maladie({ open, maladieToUpdate }) {
             </div>
           ))}
         </Modal.Body>
-        {ok && <Modal.Footer>
+         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
             Close
           </Button>
           <Button id="sub_btn" type="submit">
             {bouton}
           </Button>
-        </Modal.Footer>}
-      </form>
+        </Modal.Footer>
+      </form>}
     </Modal>
   );
 }

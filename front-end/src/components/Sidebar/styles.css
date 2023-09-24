@@ -6,7 +6,8 @@
     display: flex;
     justify-content: center;
     position: sticky;
-    background-image: linear-gradient(#cce4f2, #80e1e8, #89CCF6);
+    /* background-image: linear-gradient(#cce4f2, #80e1e8, #89CCF6); */
+    background-color: #2a52a2;
 }
 .sidebar-logo-container {
     display: 'flex';
@@ -72,7 +73,7 @@
 
 }
 .btn-logout{
-    background-color: lightslategray;
+    background-color: rgb(123, 189, 255);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -80,7 +81,7 @@
     width: 100%;
     height: 100%;
     margin-left: 0px;
-    border-radius: 15%;
+    /* border-radius: 15%; */
 
 
 }

@@ -28,7 +28,7 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.applications.densenet import preprocess_input
 from tensorflow.keras.models import load_model
 from PIL import Image
-import tensorflow as tf
+# import tensorflow as tf
 import efficientnet.keras as efn
 from flask import send_from_directory
 
@@ -116,8 +116,8 @@ app.config["MONGODB_SETTINGS"] = {
     "host": " mongodb+srv://aboudramanecamara9:tt4rjV3SnGu5vEVi@cluster0.7xbx9c8.mongodb.net/",
     "retryWrites": False,
 }
-# connect(host="mongodb://localhost:27017/donnees")
-connect(host="mongodb+srv://aboudramanecamara9:tt4rjV3SnGu5vEVi@cluster0.7xbx9c8.mongodb.net/Medical")
+connect(host="mongodb://localhost:27017/donnees")
+# connect(host="mongodb+srv://aboudramanecamara9:tt4rjV3SnGu5vEVi@cluster0.7xbx9c8.mongodb.net/Medical")
 
 
 login_manager = LoginManager()

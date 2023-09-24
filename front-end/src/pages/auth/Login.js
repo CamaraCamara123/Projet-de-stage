@@ -49,14 +49,14 @@ function Login() {
 
   return (
     <Transition>
-      <section className="vh-100 gradient-custom" style={{ height: '100vh' }}>
+      <section className="vh-100 " style={{ height: '100vh', backgroundColor:'#2a52a2' }}>
         <div className="row d-flex justify-content-center align-items-center h-100" style={{ margin: "auto" }}>
           <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div className="card bg-dark text-white" style={{ borderRadius: '1rem', height: '85vh', display: '-ms-flexbox', justifyContent: 'center' }}>
+            <div className="card text-white" style={{ backgroundColor:'#eee',borderRadius: '1rem', height: '85vh', display: '-ms-flexbox', justifyContent: 'center' }}>
               <div className="card-body p-5 text-center">
                 <div className="mb-md-5 mt-md-4 pb-5">
-                  <h2 className="fw-bold mb-2 text-uppercase">Login</h2>
-                  <p className="text-white-50 mb-5">Please enter your login and password!</p>
+                  <h2 className="fw-bold text-dark mb-2 text-uppercase">Login</h2>
+                  <p className="mb-5 text-dark">Please enter your login and password!</p>
                   <form onSubmit={handleSubmit} >
                     <div className="form-outline form-white mb-4 error-container">
                       {errorMessage && <p className="error-message">{errorMessage}</p>}
@@ -83,9 +83,9 @@ function Login() {
                       <label className="form-label" for="typePasswordX">Password</label>
                     </div>
 
-                    <p className="small mb-2 pb-lg-2"><a className="text-white-50" href="#!">Forgot password?</a></p>
+                    <p className="small mb-2 pb-lg-2 text-dark"><a className="" href="#!">Forgot password?</a></p>
                     <div className="form-outline form-white mb-2">
-                      <button className="btn btn-outline-light btn-lg px-5" type="submit" onClick={handleSubmit}>Login</button>
+                      <button className="btn btn-outline-primary btn-lg px-5" type="submit" onClick={handleSubmit}>Login</button>
                     </div>
                   </form>
                 </div>

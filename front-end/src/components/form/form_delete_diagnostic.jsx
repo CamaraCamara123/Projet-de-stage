@@ -5,6 +5,7 @@ import "./form.css";
 import { useUserData } from "../../contexts/UserDataContext";
 import { fetchConsultationDiagnostic } from "../fetchElement/fetchDiagnostic";
 import { useNavigate } from 'react-router-dom';
+import Loading from "../../constants/loading";
 
 
 function Form__delete_diagnostic({ open, diagnosticToDelete }) {
@@ -13,10 +14,12 @@ function Form__delete_diagnostic({ open, diagnosticToDelete }) {
     const [errorMessage, setErrorMessage] = useState("");
     const { updateDiagnostics, path } = useUserData()
     const navigate = useNavigate();
+    const [ok, setOk] = useState(false);
 
 
 
     const handleDelete = async () => {
+        setOk(true)
         try {
             const token = localStorage.getItem('token');
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -44,22 +47,24 @@ function Form__delete_diagnostic({ open, diagnosticToDelete }) {
 
     return (
         <Modal show={modalIsOpen} onHide={handleCloseModal}>
-            <Modal.Header closeButton>
+            {ok && <Loading />}
+            {!ok && <><Modal.Header closeButton>
                 <Modal.Title>Deletion Confirmation</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-                <p>Are you sure to delete this diagnostic?</p>
-                {successMessage && <p className="success-message">{successMessage}</p>}
-                {errorMessage && <p className="error-message">{errorMessage}</p>}
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseModal}>
-                    Close
-                </Button>
-                <Button onClick={handleDelete} className="btn-supp1">
-                    Confirm
-                </Button>
-            </Modal.Footer>
+                <Modal.Body>
+                    <p>Are you sure to delete this diagnostic?</p>
+                    {successMessage && <p className="success-message">{successMessage}</p>}
+                    {errorMessage && <p className="error-message">{errorMessage}</p>}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                    <Button onClick={handleDelete} className="btn-supp1">
+                        Confirm
+                    </Button>
+                </Modal.Footer>
+            </>}
         </Modal>
     );
 }

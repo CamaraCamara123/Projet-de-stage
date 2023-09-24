@@ -1,6 +1,7 @@
 .navbar {
-  background-image: linear-gradient(#cce4f2, #a7ccf8, #89CCF6);
+  /* background-image: linear-gradient(#cce4f2, #a7ccf8, #89CCF6); */
     height: 100px;
+    background-color: #2a52a2;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -29,6 +30,9 @@
     flex-grow: 1;
   }
   
+  .logo-nav{
+    border-radius: 50%;
+  }
   .nav-menu {
     display: flex;
     list-style: none;

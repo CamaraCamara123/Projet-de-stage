@@ -13,7 +13,7 @@ import Form_rdv from '../../components/form/form_rdv';
 import Form__delete_rdv from '../../components/form/form_delete_rdv';
 import { fetchMedecinRdvs, fetchRdv, fetchRdvs } from '../../components/fetchElement/fetchRdvs';
 import Form_consultation from '../../components/form/form_consult';
-import { fetchConsultationsRdv } from '../../components/fetchElement/fetchConsultations';
+// import { fetchConsultationsRdv } from '../../components/fetchElement/fetchConsultations';
 import Transition from '../../constants/transition';
 import Form__validate_rdv from '../../components/form/form_validate_rdv';
 import { Table } from 'react-bootstrap';
@@ -138,13 +138,13 @@ function Rdvs() {
     }
   }
 
-  const fConsultations = (rdv_id) => {
-    fetchRdv(path,rdv_id, updateRdv)
-    fetchConsultationsRdv(path,rdv_id, updateConsultations)
-    if (rdv && rdv._id == rdv_id) {
-      modalIsOpen7 ? setModalIsOpen7(false) : setModalIsOpen7(true);
-    }
-  }
+  // const fConsultations = (rdv_id) => {
+  //   fetchRdv(path,rdv_id, updateRdv)
+  //   fetchConsultationsRdv(path,rdv_id, updateConsultations)
+  //   if (rdv && rdv._id == rdv_id) {
+  //     modalIsOpen7 ? setModalIsOpen7(false) : setModalIsOpen7(true);
+  //   }
+  // }
 
   return (
     <Transition>

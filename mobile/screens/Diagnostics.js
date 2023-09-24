@@ -117,11 +117,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: 'lightgray',
-        borderRadius: 15,
+        borderRadius: 50,
+        
 
     },
     header: {
-        backgroundColor: 'khaki',
+        backgroundColor:"#00BFFF",
         padding: 10,
         elevation: 3,
         borderBottomWidth: 1,
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
         fontSize: 40,
         alignSelf: 'center',
         fontWeight: '900',
-        color: 'green'
+        color: 'white'
     }
 });
 

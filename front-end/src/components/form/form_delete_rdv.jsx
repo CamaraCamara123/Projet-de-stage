@@ -26,15 +26,7 @@ function Form__delete_rdv({ open, rdvToDelete }) {
       );
 
       if (response.status === 200) {
-        if (patient) {
-          fetchPatientRdvs(path, patient._id, updateRdvs)
-        }
-        else if (medecin) {
-          fetchMedecinRdvs(path, patient._id, updateRdvs)
-        }
-        else {
-          fetchRdvs(path, updateRdvs)
-        }
+          fetchPatientRdvs(path, rdvToDelete.patient._id, updateRdvs)
         setSuccessMessage("rendez-vous deleted successfully!");
         setErrorMessage("");
         onDelete();
@@ -43,7 +35,7 @@ function Form__delete_rdv({ open, rdvToDelete }) {
       console.error("Error deleting rendez-vous", error);
       setErrorMessage("Error deleting rendez-vous. Please try again.");
       setSuccessMessage("");
-      navigate('/login')
+      // navigate('/login')
     }
   };
 

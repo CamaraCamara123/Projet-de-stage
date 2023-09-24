@@ -23,7 +23,7 @@ function Stades() {
   const [modalIsOpen2, setModalIsOpen2] = useState(false);
   const [modalIsOpen3, setModalIsOpen3] = useState(false);
   const { stade, updateStade, path, updateImages } = useUserData();
-
+  
 
   useEffect(() => {
     setPagination(calculateRange(stades, 5));
@@ -53,6 +53,7 @@ function Stades() {
 
 
   const fdetail = (stade_id) => {
+    updateImages([])
     fetchStadeImages(path,stade_id, updateImages)
     fetchStade(path,stade_id, updateStade);
     modalIsOpen2 ? setModalIsOpen2(false) : setModalIsOpen2(true);

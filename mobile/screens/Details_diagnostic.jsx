@@ -47,7 +47,7 @@ const Details_diagnostic = () => {
     return (
       <Block style={styles.maincontainer}>
         <View style={styles.hearder} center>
-          <Text color="green" size={35} style={{ fontWeight: 'bolder' }}>
+          <Text color="white" size={35} style={{ fontWeight: 'bolder' }}>
             {consultation.rdv.patient.nom}'s diagnostics
           </Text>
         </View>
@@ -66,22 +66,22 @@ const Details_diagnostic = () => {
           </DataTable>
           <View center style={styles.cardContainer}>
             <Card style={styles.card}>
-              <Card.Content style={{}}>
-                <Paragraph style={{ alignSelf: 'center', color: '#FFD700', fontSize: 20 }}>Image diagnostic</Paragraph>
+              <Card.Content>
+                <Paragraph style={{ alignSelf: 'center', color: 'black', fontSize: 20, fontWeight: '800' }}>Diagnostic Image </Paragraph>
               </Card.Content>
               <Card.Cover source={{ uri: `${path}/uploads/${diagnostic.imagePath}` }} />
             </Card>
             <Card style={styles.card}>
               <Card.Content>
-                <Paragraph style={{ alignSelf: 'center', color: '#FFD700', fontSize: 20, fontWeight: 'bold', marginBottom: 65 }}>DEGREE OF CERTAINTY</Paragraph>
-                <Paragraph style={{ alignSelf: 'center', color: 'white', fontSize: 22, fontWeight: 'bold' }}>{diagnostic.maladie.nom} {'==>'} {diagnostic.probability} %</Paragraph>
+                <Paragraph style={{ alignSelf: 'center', color: 'black', fontSize: 20, fontWeight: '800', marginBottom: 65 }}>DEGREE OF CERTAINTY</Paragraph>
+                <Paragraph style={{ alignSelf: 'center', color: '#00008B', fontSize: 18, fontWeight: '800' }}>{diagnostic.maladie.nom} {'==>'} {diagnostic.probability} %</Paragraph>
               </Card.Content>
             </Card>
           </View>
           <View center style={styles.cardContainer}>
             <Card style={styles.card}>
               <Card.Content>
-                <Paragraph style={{ alignSelf: 'center', color: '#FFD700', fontSize: 20, fontWeight: 'bold', marginBottom: 20 }}>Requirements</Paragraph>
+                <Paragraph style={{ alignSelf: 'center', color: 'black', fontSize: 20, fontWeight: '800', marginBottom: 20 }}>Requirements</Paragraph>
                 <FlatList
                   data={diagnostic.prescription}
                   renderItem={({ item, index }) => <ListItem item={item} index={index} />}
@@ -90,7 +90,7 @@ const Details_diagnostic = () => {
             </Card>
             <Card style={styles.card}>
               <Card.Content>
-                <Paragraph style={{ alignSelf: 'center', color: '#FFD700', fontSize: 20, fontWeight: 'bold', marginBottom: 20 }}>Symptoms</Paragraph>
+                <Paragraph style={{ alignSelf: 'center', color: 'black', fontSize: 20, fontWeight: '800', marginBottom: 20 }}>Symptoms</Paragraph>
 
                 <FlatList
                   data={diagnostic.descripSymptome}
@@ -136,10 +136,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'khaki',
+    backgroundColor: '#00BFFF',
     maxHeight: 150,
     minHeight: 150,
-    borderRadius: 5
+    borderRadius: 5,
+    marginBottom:10
   },
   cardContainer: {
     flexDirection: 'row', // Met les cartes sur la même ligne
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     margin: 10,
     elevation: 4,
     width: 150,
-    backgroundColor: '#6495ED'
+    backgroundColor: '#E1EBEE'
   },
   listItem: {
     padding: 10,
@@ -160,8 +161,8 @@ const styles = StyleSheet.create({
   },
   items: {
     alignSelf: 'center',
-    color: 'white',
-    fontSize: 22,
+    color: '#00008B',
+    fontSize: 10,
     fontWeight: '900'
   }
 });

@@ -33,12 +33,12 @@ class Onboarding extends React.Component {
             <Block flex space="around" style={{ zIndex: 2 }}>
               <Block style={styles.title}>
                 <Block>
-                  <Text color="white" size={60}>
-                    Dermto
+                  <Text color="white" size={55}>
+                  Skinsafety
                   </Text>
                 </Block>
                 <Block>
-                  <Text color="white" size={60}>
+                  <Text color="white" size={55}>
                     App
                   </Text>
                 </Block>
@@ -82,8 +82,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0
   },
   logo: {
-    width: 200,
-    height: 60,
+    width: 300,
+    height: 250,
     zIndex: 2,
     position: 'relative',
     marginTop: '-50%'

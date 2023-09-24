@@ -1,5 +1,5 @@
 import { Block, Text, theme } from "galio-framework";
-import { ScrollView, StyleSheet } from "react-native";
+import { Image, ScrollView, StyleSheet } from "react-native";
 import { argonTheme } from "../constants";
 import { Button, DrawerItem as DrawerCustomItem } from "../components";
 import React, { useEffect } from "react";
@@ -9,7 +9,7 @@ import { useUserData } from "../contexts/useUserData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { fetchMedecinPatient } from "../components/fetchElement/fetchPatients";
-
+import Images from "../constants/Images";
 function CustomDrawerContent({
   drawerPosition,
   navigation,
@@ -58,7 +58,9 @@ function CustomDrawerContent({
       style={styles.container}
       forceInset={{ top: "always", horizontal: "never" }}
     >
-      
+      <Block center>
+          <Image source={Images.LogoOnboarding} style={styles.logo} />
+        </Block>
       <Block flex style={{ paddingLeft: 8, paddingRight: 14, marginTop:10 }}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           {screens.map((item, index) => {
@@ -102,12 +104,20 @@ function CustomDrawerContent({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "space-between",
   },
   header: {
     paddingHorizontal: 28,
     paddingBottom: theme.SIZES.BASE,
     paddingTop: theme.SIZES.BASE * 3,
     justifyContent: "center",
+  },
+  logo: {
+    width: 250,
+    height: 200,
+    zIndex: 2,
+    position: 'relative',
+    marginTop: 20
   },
   createButton: {
     width: 250,

@@ -9,6 +9,7 @@ import symptoms from "../../constants/list_symptoms";
 import Select from "react-select";
 import { fetchConsultationDiagnostic } from "../fetchElement/fetchDiagnostic";
 import { useNavigate } from 'react-router-dom';
+import Loading from "../../constants/loading";
 
 
 function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
@@ -25,6 +26,7 @@ function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
     const [bouton, setBouton] = useState("save")
     const [symptomes, setSyptomes] = useState([])
     const navigate = useNavigate();
+    const [ok, setOk] = useState(false);
 
 
     useEffect(() => {
@@ -47,7 +49,7 @@ function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
                 setModalIsOpen(false);
             }
         } catch (error) {
-
+            setOk(false);
         }
     }
 
@@ -75,9 +77,7 @@ function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
     ////////////////////// soumission formulaire ////////////////////
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-
-
+        setOk(true);
         try {
             if (diagnosticToUpdate) {
                 try {
@@ -181,7 +181,8 @@ function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
 
     return (
         <Modal show={modalIsOpen} onHide={handleCloseModal} size="lg">
-            <form onSubmit={handleSubmit}>
+        {ok&&<Loading/>}
+            {!ok&&<form onSubmit={handleSubmit}>
                 <Modal.Header closeButton>
                     <Modal.Title>DIAGNOSTIC FORM</Modal.Title>
                 </Modal.Header>
@@ -247,7 +248,7 @@ function Form_diagnostics({ open, consult_id, diagnosticToUpdate }) {
                         {bouton}
                     </Button>
                 </Modal.Footer>
-            </form>
+            </form>}
         </Modal>
     );
 }

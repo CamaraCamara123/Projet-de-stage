@@ -273,8 +273,8 @@ const New_Diagnostic = () => {
                             {errorMessage && <Text style={{ color: 'red' }}>{errorMessage}</Text>}
                             <Block style={styles.registerContainer}>
                                 <Block flex>
-                                    <Block flex={0.17} middle style={{ backgroundColor: 'khaki' }}>
-                                        <Text color="green" size={30} style={{ fontWeight: '900' }}>
+                                    <Block flex={0.17} middle style={{ backgroundColor: '#00BFFF', marginBottom:10 }}>
+                                        <Text color="white" size={30} style={{ fontWeight: '900' }}>
                                             New Diagnostic
                                         </Text>
                                     </Block>

@@ -127,16 +127,15 @@
 }
 .titre-stade{
   font-size: xx-large;
-  color: lightcyan;
+  color: black;
   font-style: italic;
 }
 
 .titre-stade-container{
   width: 80%;
   margin: auto;
-  background-color: coral;
-  border-radius: 15%;
-  border: solid 2px gray;
+  /* background-color: coral; */
+  border-radius: 2%;
   margin-bottom: 8px;
   align-self: center;
 }
@@ -158,11 +157,11 @@
   width: 90%;
   margin: auto;
   border-radius: 2%;
-  border: solid 4px gray;
+  /* border: solid 4px gray; */
   justify-content: center;
   align-self: center;
   padding: 5px;
-  background-color: khaki;
+  /* background-color: khaki; */
 }
 
 .img-stade{
@@ -188,7 +187,7 @@
   align-self: center;
   font-size: 60px;
   padding: auto;
-  color: lightslategrey;
+  color: white;
 
 }
 
@@ -196,10 +195,11 @@
   justify-content: center;
   margin-bottom: 20px;
   text-align: center;
-  background-color: khaki;
+  /* background-image: linear-gradient(#cce4f2, #a7ccf8, #89CCF6); */
+  background-color: #2a52a2;
   width: 100%;
-  border-radius: 30%;
-  border: 5px gray;
+  border-radius: 5%;
+  border: 5px white;
 }
 
 .rdv-container {
@@ -213,7 +213,6 @@
   position: fixed;
   bottom: 0;
   left: 55%;
-  
   margin-bottom: 20px;
 }
 
@@ -222,37 +221,58 @@
   margin: auto;
   align-self: center;
   margin-top: 10px;
-  border: solid 5px;
+  /* border: solid 5px; */
   margin-top: 20px;
-  padding: 10px;
-  border-radius: 10%;
-  background-color: dodgerblue;
+  padding: 15px;
+  border-radius: 2%;
+  /* background-color: dodgerblue; */
 
 }
 
 .day-title,.hour-title{
-  color: blue;
+  color: black;
   align-self: center;
   text-align: center;
 }
 .day-button, .selected, .notSelected{
   width: 80px;
   border-radius: 15%;
+  margin: 2px;
   justify-content: center;
 }
 
 .button-container, .hour-container{
-  width: 80%;
+  width: 100%;
   margin: auto;
   justify-content: center;
-  border: solid 5px;
+  align-content: center;
+  border: solid 1px;
   margin-top: 20px;
   padding: 10px;
-  border-radius: 10%;
+  border-radius: 2%;
   background-color: white;
 }
 
 .selected{
   background-color: blue;
   color: lightcyan;
+}
+
+.hour-selected{
+  font-size: large;
+  font-weight: 600;
+}
+.modal-container{
+  position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    display: flex !important;
+    justify-content: center !important; /* Centrer horizontalement */
+    align-items: center !important; /* Centrer verticalement */
+    z-index: 9999 !important;
+    padding: 20px !important;
+    padding-left: 20px !important;
 }

@@ -21,6 +21,7 @@ import Form_rdv from '../../components/form/form_rdv';
 import { fetchPatientMedecinVisite, fetchPatientVisite } from '../../components/fetchElement/fetchConsultations';
 import { Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { fetchMedecins } from '../../components/fetchElement/fetchMedecins';
 
 function Patients() {
   const { patients } = useUserData();
@@ -48,40 +49,45 @@ function Patients() {
     updateDoublons,
     daysOff,
     doublons,
+    updateMedecins,
     updateConsultations,
     path
-   } = useUserData();
-   const navigate = useNavigate();
+  } = useUserData();
+  const navigate = useNavigate();
 
   updateMedecin(null);
   // updatePatient(null);
   updateSecretaire(null)
 
   useEffect(() => {
-    const updatedMedecinRdv = {};
+    const fetch = async () => {
+      await fetchMedecins(path, updateMedecins);
+      const updatedMedecinRdv = {};
 
-    for (const medecin of medecins) {
-      let rdvIdCounter = 0;
-      let tel = medecin.tel;
-      const rdvsForMedecin = [];
+      for (const medecin of medecins) {
+        let rdvIdCounter = 0;
+        let tel = medecin.tel;
+        const rdvsForMedecin = [];
 
-      for (const rdv_medecin of medecin.rdv) {
-        const newRdv = {
-          Id: rdvIdCounter,
-          Subject: rdv_medecin.patient.nom,
-          StartTime: rdv_medecin.dateDebutRdv,
-          EndTime: rdv_medecin.dateFinRdv,
-          Color: '#FF5733'
-        };
-        rdvsForMedecin.push(newRdv);
+        for (const rdv_medecin of medecin.rdv) {
+          const newRdv = {
+            Id: rdvIdCounter,
+            Subject: rdv_medecin.patient.nom,
+            StartTime: rdv_medecin.dateDebutRdv,
+            EndTime: rdv_medecin.dateFinRdv,
+            Color: '#FF5733'
+          };
+          rdvsForMedecin.push(newRdv);
 
-        rdvIdCounter++;
+          rdvIdCounter++;
+        }
+
+        updatedMedecinRdv[tel] = rdvsForMedecin;
       }
 
-      updatedMedecinRdv[tel] = rdvsForMedecin;
+      updateMedecinRdvs(updatedMedecinRdv);
     }
-
-    updateMedecinRdvs(updatedMedecinRdv);
+    fetch();
   }, [medecins]);
 
   useEffect(() => {
@@ -199,8 +205,8 @@ function Patients() {
     modalIsOpen2 ? setModalIsOpen2(false) : setModalIsOpen2(true);
   }
 
-  const fdelete = (user_id) => {
-    fetchPatient(user_id);
+  const fdelete = async (user_id) => {
+    await fetchPatient(user_id);
     console.log(patient);
     modalIsOpen3 ? setModalIsOpen3(false) : setModalIsOpen3(true);
   }
@@ -218,7 +224,7 @@ function Patients() {
   }
 
   const fmesVisits = (user_id) => {
-    if (userData.role.includes('medecin')) {
+    if (userData.role.includes('medecin')&&!userData.role.includes('admin')) {
       fetchPatientMedecinVisite(path, userData._id, user_id, updateConsultations)
     } else {
       fetchPatientVisite(path, user_id, updateConsultations);
@@ -326,7 +332,7 @@ function Patients() {
                           <FontAwesomeIcon icon={faEye} />
                         </button>
                       </span>
-                      {userData.role.includes('secretaire') && <span>
+                      {userData.role.includes('secretaire') && !userData.role.includes('admin') &&<span>
                         <button className='elt-btn btn btn-dark' title='new appointment' onClick={() => {
                           closeModal()
                           fNewRdvs(patient._id)
