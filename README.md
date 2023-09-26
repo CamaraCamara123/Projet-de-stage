@@ -49,9 +49,7 @@ front-end
 │   ├── favicon.ico
 │   ├── index.html
 |   ├── images
-|   |  ├── profile
-|   |  ├── consultation
-|   |  └── maladies   
+|   |  └── static   
 │   ├── manifest.json
 │   └── robots.txt
 └── src
@@ -84,6 +82,7 @@ front-end
     │   ├── fetchElement
     │   │   ├── fetchConsultations.jsx
     |   |   ├── fetchImages.jsx
+    |   |   ├── fetchDiagnostics.jsx
     |   |   ├── fetchMaladies.jsx
     |   |   ├── fetchMedecins.jsx
     |   |   ├── fetchPatients.jsx
@@ -92,7 +91,7 @@ front-end
     │   │   └── fetchStades.jsx
     │   ├── form
     │   │   ├── Agenda_medecin.jsx
-    |   |   ├── form_cart_consultation.jsx
+    |   |   ├── form_chart_consultation.jsx
     |   |   ├── form_diagnostic.jsx
     |   |   ├── form_delete_consult.jsx
     |   |   ├── form_delete_maladie.jsx
