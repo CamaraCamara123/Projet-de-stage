@@ -144,7 +144,7 @@ front-end
         └──
 ```
 
- **Mobile: *** react native
+ **Mobile:** react native
 
 Install Mobile app with npm
 
@@ -161,7 +161,7 @@ To run locally, run the following command
   npm start
 ```
 
- **backend : *** python frameword Flask, MongoDB database
+ **backend :** python frameword Flask, MongoDB database
 
 Install dependences with pip or pip3
 
