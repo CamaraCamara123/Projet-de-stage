@@ -93,7 +93,7 @@ front-end
     │   ├── form
     │   │   ├── Agenda_medecin.jsx
     |   |   ├── form_cart_consultation.jsx
-    |   |   ├── form_consult.jsx
+    |   |   ├── form_diagnostic.jsx
     |   |   ├── form_delete_consult.jsx
     |   |   ├── form_delete_maladie.jsx
     |   |   ├── form_delete_rdv.jsx
@@ -144,12 +144,35 @@ front-end
         └──
 ```
 
- ** mobile: *** react native
+ **Mobile: *** react native
 
+Install Mobile app with npm
 
+```bash
+  cd mobile
+  npm install --force
+```
 
- ** backend : ** python frameword Flask, MongoDB database
+## Run Locally
 
+To run locally, run the following command
+
+```bash
+  npm start
+```
+
+ **backend : *** python frameword Flask, MongoDB database
+
+Install dependences with pip or pip3
+
+```bash
+  pip install -r requirements.txt
+```
+or
+
+```bash
+  pip3 install -r requirements.txt
+```
 
 ## Author
 
