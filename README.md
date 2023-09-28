@@ -10,7 +10,7 @@
 Clone the repo
 
 ```bash
-  git clone https://github.com/CamaraCamara123/Projet-de-stage.git/front-end
+  git clone https://github.com/CamaraCamara123/Projet-de-stage.git
 ```
 
 Install front-end with npm
