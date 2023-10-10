@@ -10,7 +10,7 @@
 Clone the repo
 
 ```bash
-  git clone https://github.com/CamaraCamara123/Projet-de-stage.git
+  git clone https://github.com/CamaraCamara123/skinsafety_app.git
 ```
 
 Install front-end with npm
