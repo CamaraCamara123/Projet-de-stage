@@ -11,7 +11,7 @@ export function useUserData() {
 // Composant Provider pour envelopper l'application et fournir les données utilisateur
 export function UserDataProvider({ children }) {
 
-  
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const [userData, setUserData] = useState(null);
@@ -43,7 +43,7 @@ export function UserDataProvider({ children }) {
 
   const [diagnostics, setDiagnostics] = useState([])
   const [diagnostic, setDiagnostic] = useState(null)
-  const [path, setPath] = useState("http://192.168.11.104:5000")
+  const [path, setPath] = useState("http://100.78.211.76:5000")
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -116,10 +116,10 @@ export function UserDataProvider({ children }) {
     setRdv(data)
   }
 
-  const updateDiagnostics = (data)=>{
+  const updateDiagnostics = (data) => {
     setDiagnostics(data)
   }
-  const updateDiagnostic = (data)=>{
+  const updateDiagnostic = (data) => {
     setDiagnostic(data)
   }
 
@@ -143,11 +143,11 @@ export function UserDataProvider({ children }) {
         image, updateImage,
         rdvs, updateRdvs,
         rdv, updateRdv,
-        modalIsOpen,closeModal,openModal,
-        consultations,updateConsultations,
+        modalIsOpen, closeModal, openModal,
+        consultations, updateConsultations,
         consultation, updateConsultation,
-        diagnostics,updateDiagnostics,
-        diagnostic,updateDiagnostic,
+        diagnostics, updateDiagnostics,
+        diagnostic, updateDiagnostic,
         path
       }}>
       {children}

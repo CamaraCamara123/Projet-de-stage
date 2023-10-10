@@ -52,7 +52,7 @@ export function UserDataProvider({ children }) {
   const [medecinRdvs, setMedecinRdvs] = useState([])
   const [daysOff, setDaysOff] = useState([])
   const [doublons, setDoublons] = useState([])
-  const [path, setPath] = useState("http://192.168.11.104:5000");
+  const [path, setPath] = useState("http://100.78.211.76:5000");
 
 
   const openModal = () => {
@@ -130,32 +130,32 @@ export function UserDataProvider({ children }) {
     setMedecinRdvs(data)
   }
 
-  const isPatient = (data)=>{
+  const isPatient = (data) => {
     setBoolPatient(data)
   }
-  const isMedecin = (data) =>{
+  const isMedecin = (data) => {
     setBoolMedecin(data)
   }
 
-  const updateDiagnostics = (data)=>{
+  const updateDiagnostics = (data) => {
     setDiagnostics(data)
   }
-  const updateDiagnostic = (data)=>{
+  const updateDiagnostic = (data) => {
     setDiagnostic(data)
   }
 
-  const updatedDoctor_agenda =(data) =>{
+  const updatedDoctor_agenda = (data) => {
     setDoctor_agenda(data)
   }
   const updateAgenda = (data) => {
     setAgenda(data)
   }
 
-  const updateDaysOff = (data)=>{
+  const updateDaysOff = (data) => {
     setDaysOff(data)
   }
 
-  const updateDoublons = (data)=>{
+  const updateDoublons = (data) => {
     setDoublons(data)
   }
 
@@ -179,18 +179,18 @@ export function UserDataProvider({ children }) {
         image, updateImage,
         rdvs, updateRdvs,
         rdv, updateRdv,
-        modalIsOpen,closeModal,openModal,
-        consultations,updateConsultations,
+        modalIsOpen, closeModal, openModal,
+        consultations, updateConsultations,
         consultation, updateConsultation,
-        boolPatient,isPatient,
-        boolMedecin,isMedecin,
-        diagnostics,updateDiagnostics,
-        diagnostic,updateDiagnostic,
+        boolPatient, isPatient,
+        boolMedecin, isMedecin,
+        diagnostics, updateDiagnostics,
+        diagnostic, updateDiagnostic,
         doctor_agenda, updatedDoctor_agenda,
-        agenda,updateAgenda,
-        medecinRdvs,updateMedecinRdvs,
+        agenda, updateAgenda,
+        medecinRdvs, updateMedecinRdvs,
         daysOff, updateDaysOff,
-        doublons,updateDoublons,
+        doublons, updateDoublons,
         path
       }}>
       {children}
