@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import CanvasJSReact from '@canvasjs/react-charts';
 import { Card, Col, Container, Modal, Row } from 'react-bootstrap';
+import { useUserData } from '../../contexts/UserDataContext';
 
 
 function Form_detail_diagnostic({ open, details, type, diagnostic }) {
     const [modalIsOpen, setModalIsOpen] = useState(open);
     const CanvasJSChart = CanvasJSReact.CanvasJSChart;
     const CanvasJS = CanvasJSReact.CanvasJS; 
-    
+    const {path} = useUserData();
 
     const formatPercentage = (e) => {
         return CanvasJS.formatNumber(e.value, "#.#") + "%";
@@ -101,7 +102,7 @@ function Form_detail_diagnostic({ open, details, type, diagnostic }) {
                             <Card>
                                 <Card.Header>diagnostic IMAGE</Card.Header>
                                 <Card.Body style={{justifyContent:'center'}}>
-                                    <img src={`http://192.168.11.104:5000/uploads/${diagnostic.imagePath}`} alt={diagnostic.imageName} style={{width:'100%', height:'300px', margin:'auto'}}/>
+                                    <img src={`${path}/uploads/${diagnostic.imagePath}`} alt={diagnostic.imageName} style={{width:'100%', height:'300px', margin:'auto'}}/>
                                 </Card.Body>
 
                             </Card>

@@ -146,7 +146,7 @@ export default function DossierMedical() {
                                 <td className='case'>{new Date(diagnostic.consultation.dateConsult).toISOString().split('T')[0]}</td>
                                 <td className='case'>{consult.rdv.medecin.nom} {consult.rdv.medecin.prenom}</td>
                                 <td className='case'>
-                                  <strong>{diagnostic.maladie.nom}</strong>
+                                  <strong>{diagnostic.maladie?.nom}</strong>
                                 </td>
                                 <td className='case'>
                                   <strong>{diagnostic.probability} %</strong>

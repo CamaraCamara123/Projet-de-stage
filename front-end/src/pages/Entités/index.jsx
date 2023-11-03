@@ -55,6 +55,10 @@ function Patients() {
   } = useUserData();
   const navigate = useNavigate();
 
+  const [loadRdv, setLoadRdv] = useState(false);
+  const [loadOffDays, setLoadOffDays] = useState(false);
+
+
   updateMedecin(null);
   // updatePatient(null);
   updateSecretaire(null)
@@ -86,8 +90,11 @@ function Patients() {
       }
 
       updateMedecinRdvs(updatedMedecinRdv);
+      setLoadRdv(true);
     }
-    fetch();
+    if (!loadRdv) {
+      fetch();
+    }
   }, [medecins]);
 
   useEffect(() => {
@@ -127,8 +134,11 @@ function Patients() {
       }
       await updateDoublons(listdoublons)
       await updateDaysOff(listDayOff)
+      setLoadOffDays(true)
     };
-    freeDay();
+    if (!loadOffDays) {
+      freeDay();
+    }
   }, [medecinRdvs])
 
   console.log("days off : ", daysOff)
@@ -224,7 +234,7 @@ function Patients() {
   }
 
   const fmesVisits = (user_id) => {
-    if (userData.role.includes('medecin')&&!userData.role.includes('admin')) {
+    if (userData.role.includes('medecin') && !userData.role.includes('admin')) {
       fetchPatientMedecinVisite(path, userData._id, user_id, updateConsultations)
     } else {
       fetchPatientVisite(path, user_id, updateConsultations);
@@ -332,7 +342,7 @@ function Patients() {
                           <FontAwesomeIcon icon={faEye} />
                         </button>
                       </span>
-                      {userData.role.includes('secretaire') && !userData.role.includes('admin') &&<span>
+                      {userData.role.includes('secretaire') && !userData.role.includes('admin') && <span>
                         <button className='elt-btn btn btn-dark' title='new appointment' onClick={() => {
                           closeModal()
                           fNewRdvs(patient._id)

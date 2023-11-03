@@ -166,7 +166,7 @@ function Diagnostics() {
                                             <span>{diagnostic.probability ? `${diagnostic.probability}%` : "Nothing"}</span>
                                         </td>
                                         <td>
-                                            <img src={`http://192.168.11.104:5000/uploads/${diagnostic.imagePath}`} alt={diagnostic.imageName} width={50} height={50} />
+                                            <img src={`${path}/uploads/${diagnostic.imagePath}`} alt={diagnostic.imageName} width={50} height={50} />
                                         </td>
                                         <td>
                                             <span>

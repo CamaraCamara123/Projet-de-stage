@@ -47,7 +47,8 @@ def convert_objet_to_dict(objet, depth=1, max_depth=3):
             )
         elif isinstance(field_value, list):
             field_value = [
-                convert_objet_to_dict(item, depth=depth + 1, max_depth=max_depth)
+                convert_objet_to_dict(
+                    item, depth=depth + 1, max_depth=max_depth)
                 for item in field_value
             ]
         elif isinstance(field_value, ObjectId):
@@ -85,14 +86,16 @@ def token_required(f):
         if "Authorization" in request.headers:
             auth_header = request.headers["Authorization"]
             token = (
-                auth_header.split(" ")[1] if len(auth_header.split(" ")) > 1 else None
+                auth_header.split(" ")[1] if len(
+                    auth_header.split(" ")) > 1 else None
             )
 
         if not token:
             return jsonify({"message": "Token manquant"}), 401
 
         try:
-            data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
+            data = jwt.decode(
+                token, app.config["SECRET_KEY"], algorithms=["HS256"])
             current_user = get_user_from_database(data["sub"])
 
             return f(current_user, *args, **kwargs)
@@ -187,7 +190,7 @@ def create_admin(current_user):
         nom=nom,
         prenom=prenom,
         tel=tel,
-        genre = genre,
+        genre=genre,
         role=["admin", "medecin", "patient"],
     )
 
@@ -213,7 +216,8 @@ def login():
             "sub": str(user_data._id),
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),
         }
-        token = jwt.encode(payload, app.config["SECRET_KEY"], algorithm="HS256")
+        token = jwt.encode(
+            payload, app.config["SECRET_KEY"], algorithm="HS256")
 
         return jsonify({"token": token}), 200
     else:
@@ -387,7 +391,8 @@ def upload_patient_image(current_user, username):
         image.save(image_path)
 
         user.photoName = filename
-        user.photo = os.path.join("uploads", "images", "profil", username, filename)
+        user.photo = os.path.join(
+            "uploads", "images", "profil", username, filename)
         user.save()
 
         return jsonify({"message": "Image uploaded successfully"}), 200
@@ -441,7 +446,8 @@ def update_patient(current_user, patient_id):
 
     patient.username = data.get("username", patient.username)
     patient.password = data.get("password", patient.password)
-    patient.confirmPassword = data.get("confirmPassword", patient.confirmPassword)
+    patient.confirmPassword = data.get(
+        "confirmPassword", patient.confirmPassword)
     patient.nom = data.get("nom", patient.nom)
     patient.prenom = data.get("prenom", patient.prenom)
     patient.birthdate = data.get("birthdate", patient.birthdate)
@@ -570,7 +576,8 @@ def create_dermatologue(current_user):
 def get_all_dermatologues(current_user):
     dermatologues = Dermatologue.objects.all()
 
-    dermatologues_data = [convert_objet_to_dict(derm) for derm in dermatologues]
+    dermatologues_data = [convert_objet_to_dict(
+        derm) for derm in dermatologues]
     return jsonify(dermatologues_data), 200
 
 
@@ -657,7 +664,8 @@ def get_patients_for_medecin(current_user, medecin_id):
     for rdv in rdvs:
         unique_patients.add(rdv.patient)
 
-    patients_data = [convert_objet_to_dict(patient) for patient in unique_patients]
+    patients_data = [convert_objet_to_dict(
+        patient) for patient in unique_patients]
     return jsonify(patients_data), 200
 
 
@@ -740,7 +748,8 @@ def create_secretaire(current_user):
 # @admin_required
 def get_secretaires(current_user):
     secretaires = Secretaire.objects.all()
-    secretaires_data = [convert_objet_to_dict(secretaire) for secretaire in secretaires]
+    secretaires_data = [convert_objet_to_dict(
+        secretaire) for secretaire in secretaires]
     return jsonify(secretaires_data), 200
 
 
@@ -852,7 +861,8 @@ def delete_rdv(current_user, rdv_id):
 
     if rdv.consultation:
         for diagnostic in rdv.consultation.diagnostics:
-            formatted_datetime = diagnostic.dateDiagnostic.strftime("%Y-%m-%d_%H-%M-%S")
+            formatted_datetime = diagnostic.dateDiagnostic.strftime(
+                "%Y-%m-%d_%H-%M-%S")
             consult_folder = os.path.join(
                 app.config["UPLOAD_FOLDER"],
                 "uploads",
@@ -924,7 +934,8 @@ def get_rdv_by_patient(current_user, patient_id):
     except Patient.DoesNotExist:
         return jsonify({"message": "Patient introuvable"}), 404
 
-    rdvs = Rendez_vous.objects.filter(patient=patient).order_by("-dateDebutRdv")
+    rdvs = Rendez_vous.objects.filter(
+        patient=patient).order_by("-dateDebutRdv")
 
     rdv_data = [convert_objet_to_dict(rdv) for rdv in rdvs]
     return jsonify(rdv_data), 200
@@ -935,7 +946,8 @@ def get_rdv_by_patient(current_user, patient_id):
 @token_required
 def get_today_rdv(current_user):
     today = datetime.datetime.today()
-    start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
+    start_of_day = datetime.datetime.combine(
+        today, datetime.datetime.min.time())
     end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
 
     # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
@@ -976,7 +988,8 @@ def medecin_futur_rdv(current_user, derm_id):
 
     today = datetime.datetime.today()
 
-    start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
+    start_of_day = datetime.datetime.combine(
+        today, datetime.datetime.min.time())
     end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
 
     # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
@@ -1001,7 +1014,8 @@ def get_dermatologue_today_rdv(current_user, derm_id):
     # print(today)
     # # Filtrez les rendez-vous pour n'inclure que ceux d'aujourd'hui
     # rdvs = Rendez_vous.objects.filter(medecin=derms, dateDebutRdv__date=today).order_by("-dateDebutRdv")
-    start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
+    start_of_day = datetime.datetime.combine(
+        today, datetime.datetime.min.time())
     end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
 
     # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
@@ -1108,7 +1122,8 @@ def consultation_medecin_patient(current_user, medecin_id, patient_id):
     for rdv in rdvs:
         consultations.append(rdv.consultation)
 
-    consultation_data = [convert_objet_to_dict(consult) for consult in consultations]
+    consultation_data = [convert_objet_to_dict(
+        consult) for consult in consultations]
     return jsonify(consultation_data), 200
 
 
@@ -1125,7 +1140,8 @@ def get_dermatologue_today_visite(current_user, derm_id):
     # print(today)
     # # Filtrez les rendez-vous pour n'inclure que ceux d'aujourd'hui
     # rdvs = Rendez_vous.objects.filter(medecin=derms, dateDebutRdv__date=today).order_by("-dateDebutRdv")
-    start_of_day = datetime.datetime.combine(today, datetime.datetime.min.time())
+    start_of_day = datetime.datetime.combine(
+        today, datetime.datetime.min.time())
     end_of_day = datetime.datetime.combine(today, datetime.datetime.max.time())
 
     # Maintenant, vous pouvez filtrer les rendez-vous pour aujourd'hui
@@ -1138,7 +1154,8 @@ def get_dermatologue_today_visite(current_user, derm_id):
     consultations = []
     for rdv in rdvs:
         consultations.append(rdv.consultation)
-    consultation_data = [convert_objet_to_dict(consult) for consult in consultations]
+    consultation_data = [convert_objet_to_dict(
+        consult) for consult in consultations]
     return jsonify(consultation_data), 200
 
 
@@ -1162,7 +1179,8 @@ def consultation_patient(current_user, patient_id):
     for rdv in rdvs:
         consultations.append(rdv.consultation)
 
-    consultation_data = [convert_objet_to_dict(consult) for consult in consultations]
+    consultation_data = [convert_objet_to_dict(
+        consult) for consult in consultations]
     return jsonify(consultation_data), 200
 
 
@@ -1177,7 +1195,8 @@ def delete_consultation(current_user, consult_id):
 
     if consultation.diagnostics:
         for diagnostic in consultation.diagnostics:
-            img_folder = os.path.join(app.config["UPLOAD_FOLDER"], diagnostic.imagePath)
+            img_folder = os.path.join(
+                app.config["UPLOAD_FOLDER"], diagnostic.imagePath)
             try:
                 shutil.rmtree(img_folder)
                 diagnostic.delete()
@@ -1311,7 +1330,8 @@ def upload_consutation_image(current_user, diagnostic_id):
 
     if image and allowed_file(image.filename):
         filename = secure_filename(image.filename)
-        formatted_datetime = diagnostic.dateDiagnostic.strftime("%Y-%m-%d_%H-%M-%S")
+        formatted_datetime = diagnostic.dateDiagnostic.strftime(
+            "%Y-%m-%d_%H-%M-%S")
         diagnostic_folder = os.path.join(
             app.config["UPLOAD_FOLDER"],
             "uploads",
@@ -1383,7 +1403,8 @@ def diagnostic_maladie(current_user, diagnostic_id):
     efficient.load_weights(
         "efficient.h5"
     )  # le même modèle que je t'ai envoyé ms cette fois-ci on va servir juste de ses poids
-    classe = {0: "akiec", 1: "bcc", 2: "bkl", 3: "df", 4: "mel", 5: "nv", 6: "vasc"}
+    classe = {0: "akiec", 1: "bcc", 2: "bkl",
+              3: "df", 4: "mel", 5: "nv", 6: "vasc"}
 
     for key, value in classe.items():
         try:
@@ -1459,7 +1480,8 @@ def valide_diagnostic(current_user, diagnostic_id, maladie_id):
     )
     image_stade.stade = stade
     print(diagnostic.imagePath)
-    source_file_path = os.path.join(app.config["UPLOAD_FOLDER"], diagnostic.imagePath)
+    source_file_path = os.path.join(
+        app.config["UPLOAD_FOLDER"], diagnostic.imagePath)
     destination_file_path = os.path.join(
         app.config["UPLOAD_FOLDER"],
         "uploads",
@@ -1489,7 +1511,8 @@ def diagnostics_by_consultation(current_user, consult_id):
     diagnostics = Diagnostic.objects.filter(consultation=consultation).order_by(
         "-dateDiagnostic"
     )
-    diagnostic_data = [convert_objet_to_dict(diagnostic) for diagnostic in diagnostics]
+    diagnostic_data = [convert_objet_to_dict(
+        diagnostic) for diagnostic in diagnostics]
     return jsonify(diagnostic_data), 201
 
 
@@ -1502,7 +1525,8 @@ def delete_diagnostic(current_user, diagnostic_id):
     except Diagnostic.DoesNotExist:
         return jsonify({"message": "Diagnostic not found"}), 404
 
-    formatted_datetime = diagnostic.dateDiagnostic.strftime("%Y-%m-%d_%H-%M-%S")
+    formatted_datetime = diagnostic.dateDiagnostic.strftime(
+        "%Y-%m-%d_%H-%M-%S")
     diagnostic_folder = os.path.join(
         app.config["UPLOAD_FOLDER"],
         "uploads",
@@ -1805,4 +1829,4 @@ def images_stade(current_user, stade_id):
 
 
 if __name__ == "__main__":
-    app.run(host="100.78.211.76", port=5000)
+    app.run(host="localhost", port=5000)
